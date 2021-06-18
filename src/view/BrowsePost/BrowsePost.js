@@ -11,6 +11,7 @@ import Button from "../../component/CustomButtons/Button.js";
 
 import CustomTabs from "../../component/CustomTabs/CustomTabs.js";
 import ListBrowsePost from "./ListBrowsePost/ListBrowsePost.js"
+import AcceptedBrowsePost from "./AcceptedBrowsePost/AcceptedBrowsePost.js";
 const styles = {
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -51,13 +52,13 @@ export default function Apart() {
                     <ListBrowsePost/>
                 )
               },
-            //   {
-            //     tabName: "Yêu cầu đã xử lý",
-            //     //tabIcon: Code,
-            //     tabContent: (
-            //       <AddApart/>
-            //     )
-            //   },
+              {
+                tabName: "Yêu cầu đã xử lý",
+                //tabIcon: Code,
+                tabContent: (
+                  <AcceptedBrowsePost/>
+                )
+              },
               
             ]}
           />

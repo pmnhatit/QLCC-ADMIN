@@ -5,6 +5,7 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import store from './store';
 import Main from './view/Main/main';
+import notifications from "./notifications"
 
 ReactDOM.render(
   <Provider store={store}>

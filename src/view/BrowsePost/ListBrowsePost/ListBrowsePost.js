@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from "react";
+
 import { useSelector } from "react-redux";
 import { handleData } from "./ServiceListBrowsePost.js";
-import CustomButton from "../../../component/CustomButtons/Button.js"
+
 import { useHistory } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
+import EditIcon from '@material-ui/icons/Edit';
+import Tooltip from "@material-ui/core/Tooltip";
+import Fab from '@material-ui/core/Fab';
+import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
+import { makeStyles } from "@material-ui/core/styles";
 
-export default function ListApart() {
+const useStyles = makeStyles(styles);
+
+export default function ListBrowsePost() {
+  const classes = useStyles();
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
@@ -67,17 +76,29 @@ export default function ListApart() {
       },
     },
     {
-      name: "Chi tiết",
+      name: "",
       options: {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
-            <CustomButton
-              variant="outlined"
-              color="primary"
+            
+            <div>
+            <Tooltip
+            id="tooltip-top"
+            title="Chi tiết"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <Fab
+              size="small"
+              color="default"
+              aria-label="add"
+              className={classes.margin}
               onClick={() => handleClick(tableMeta.rowData[0])}
             >
-              Chi tiết
-            </CustomButton>
+              <EditIcon color="primary" />
+            </Fab>
+          </Tooltip>
+          </div>
           );
         },
       },
@@ -86,6 +107,37 @@ export default function ListApart() {
   const handleClick = (id) => {
 
     history.push(`/admin/browse_post/detail/${id}`);
+  };
+  const handleChangeStatus = async (id) => {
+    try {
+      const body=
+      {
+        notice_id: id,
+        admin_status: true
+      }
+    
+      console.log(body);
+      const res = await fetch(
+        process.env.REACT_APP_API_LINK + `/api/repair/admin/update-is-read`,
+        {
+          method: "PUT",
+          mode: "cors",
+          headers: {
+            Authorization: "Bearer " + `${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      if (res.status === 200) {
+        console.log("ok");
+     
+      } else {
+        console.log("SOMETHING WENT WRONG");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   useEffect(() => {

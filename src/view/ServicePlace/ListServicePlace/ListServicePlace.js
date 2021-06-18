@@ -4,8 +4,15 @@ import { handleData } from "./ServiceLisServicetPlace.js";
 import CustomButton from "../../../component/CustomButtons/Button.js"
 import { useHistory } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
+import EditIcon from '@material-ui/icons/Edit';
+import Tooltip from "@material-ui/core/Tooltip";
+import Fab from '@material-ui/core/Fab';
+import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
+import { makeStyles } from "@material-ui/core/styles";
 
+const useStyles = makeStyles(styles);
 export default function ListServicePlace() {
+  const classes = useStyles();
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
@@ -49,22 +56,33 @@ export default function ListServicePlace() {
         sort: false,
       },
     },
-    {
-      name: "Chi tiết",
-      options: {
-        customBodyRender: (value, tableMeta, updateValue) => {
-          return (
-            <CustomButton
-              variant="outlined"
-              color="primary"
-              onClick={() => handleClick(tableMeta.rowData[0])}
-            >
-              Chi tiết
-            </CustomButton>
-          );
-        },
-      },
-    },
+    // {
+    //   name: "Chi tiết",
+    //   options: {
+    //     customBodyRender: (value, tableMeta, updateValue) => {
+    //       return (
+    //         <div>
+    //         <Tooltip
+    //         id="tooltip-top"
+    //         title="Chi tiết"
+    //         placement="top"
+    //         classes={{ tooltip: classes.tooltip }}
+    //       >
+    //         <Fab
+    //           size="small"
+    //           color="primary"
+    //           aria-label="add"
+    //           className={classes.margin}
+    //           onClick={() => handleClick(tableMeta.rowData[0])}
+    //         >
+    //           <EditIcon />
+    //         </Fab>
+    //       </Tooltip>
+    //       </div>
+    //       );
+    //     },
+    //   },
+    // },
   ];
   const handleClick = (id) => {
 

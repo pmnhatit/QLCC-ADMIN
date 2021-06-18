@@ -174,14 +174,14 @@ const dashboardRoutes = [
     component:UserAccount ,
     layout: "/admin"
   },
-  {
-    path: "/admin_account",
-    name: "Quản lý admin",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: Person,
-    component:AdminAccount ,
-    layout: "/admin"
-  },
+  // {
+  //   path: "/admin_account",
+  //   name: "Quản lý admin",
+  //   rtlName: "ملف تعريفي للمستخدم",
+  //   icon: Person,
+  //   component:AdminAccount ,
+  //   layout: "/admin"
+  // },
   {
     path: "/repair/repair/detail/:notice_id",
     name: "Sửa chữa dịch vụ",

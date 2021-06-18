@@ -14,12 +14,15 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import EditIcon from '@material-ui/icons/Edit';
+import Close from "@material-ui/icons/Close";
+import Check from "@material-ui/icons/Check";
+import Tooltip from "@material-ui/core/Tooltip";
+import Fab from '@material-ui/core/Fab';
+import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
 
-const useStyles = makeStyles((theme) => ({
-  MyButton: {
-    margin: theme.spacing(1),
-  },
-}));
+const useStyles = makeStyles(styles);
+
 export default function AllBill(props) {
   const classes = useStyles();
   const history = useHistory();
@@ -133,25 +136,58 @@ export default function AllBill(props) {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <div>
-              <MyButton
-                //className={classes.MyButton}
-                //variant="outlined"
-                color="primary"
-                onClick={() => handleClick(tableMeta.rowData[0])}
+            <Tooltip
+            id="tooltip-top"
+            title="Chi tiết"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <Fab
+              size="small"
+              color="red"
+              aria-label="add"
+              className={classes.margin}
+              onClick={() => handleClick(tableMeta.rowData[0])}
+            >
+              <EditIcon color="primary"/>
+            </Fab>
+          </Tooltip>
+          {  !tableMeta.rowData[9]?
+          <Tooltip
+          id="tooltip-top"
+          title="Chấp nhận"
+          placement="top"
+          classes={{ tooltip: classes.tooltip }}
+        >
+          <Fab
+            size="small"
+            color="primary"
+            aria-label="add"
+            className={classes.margin}
+            onClick={() => handleIsPay(tableMeta.rowData)}
+          >
+            <Check />
+          </Fab>
+        </Tooltip>: <Tooltip
+                id="tooltip-top-start"
+                title="Không chấp nhận"
+                placement="top"
+                classes={{ tooltip: classes.tooltip }}
               >
-                Chi tiết
-              </MyButton>
-
-              <MyButton
-                className={classes.MyButton}
-                //variant="outlined"
-                color="danger"
-                
-                onClick={() => handleIsPay(tableMeta.rowData)}
-              >
-              {  tableMeta.rowData[9]?"Hủy thanh toán":"  Thanh toán  "}
-              </MyButton>
-            </div>
+                <Fab
+                  size="small"
+                  color="secondary"
+                  aria-label="add"
+                  className={classes.margin}
+                  onClick={() => handleIsPay(tableMeta.rowData)}
+                >
+                  <Close />
+                </Fab>
+              </Tooltip>}
+            
+          </div>
+              
+            
           );
         },
       },

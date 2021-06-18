@@ -1,12 +1,16 @@
-import React  from 'react';
+import React from 'react';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Login from "../Login/login";
 import Admin from "../../layouts/Layout";
-
+import {messaging} from "../../firebase"
 
 export default function Main()
-{
-    
+{   
+  messaging.onMessage(async (payload) => {
+    console.log('Message received. ', payload);
+    // ...
+  });
+  console.log("main");
     const LoginContainer = () => (
         <div className="container">
           {/* <Route exact path="/" render={() => <Redirect to="/login" />} /> */}

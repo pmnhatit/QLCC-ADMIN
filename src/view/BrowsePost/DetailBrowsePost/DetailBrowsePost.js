@@ -9,7 +9,7 @@ import GridContainer from "../../../component/Grid/GridContainer.js";
 import CardHeader from "../../../component/Card/CardHeader.js";
 import Button from "../../../component/CustomButtons/Button.js";
 import Card from "../../../component/Card/Card.js";
-import CardAvatar from "../../../component/Card/CardAvatar.js";
+//import CardAvatar from "../../../component/Card/CardAvatar.js";
 import SlideShow from "../../../component/SlideShow/SlideShow.js"
 import TextField from "@material-ui/core/TextField";
 
@@ -273,7 +273,7 @@ export default function DetailRequestSelfRepair() {
         <GridContainer>
           <GridItem xs={12} sm={12} md={5}>
             <Card profile>
-              <SlideShow images={image}></SlideShow>
+              <SlideShow  images={image}></SlideShow>
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={7}>

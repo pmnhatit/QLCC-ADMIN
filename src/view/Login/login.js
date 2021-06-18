@@ -16,7 +16,9 @@ import Container from "@material-ui/core/Container";
 import Snackbar from "@material-ui/core/Snackbar";
 import { addUser } from "../../redux/action/userAction";
 import { useHistory } from "react-router-dom";
-import { isAdmin } from "./ServiceLogin.js";
+
+import {messaging,receiveMessage} from "../../firebase.js"
+
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -75,6 +77,17 @@ export default function Login() {
     }
     return true;
   };
+
+  
+  const changeToken_device=async()=>
+  {
+    
+    messaging.requestPermission().then(()=>{
+      return messaging.getToken();
+    }).then(token_device=>{
+      console.log( token_device)
+    })
+  }
   const sendUser = async () => {
     try {
       if (!checkUser(username, password)) {
@@ -110,8 +123,9 @@ export default function Login() {
       
           const action = addUser(result.infoUser,result.token);
           dispatch(action);
-  
-          history.push("/admin");
+          changeToken_device();
+
+          //history.push("/admin");
         } else if (res.status === 401) {
           setContent("Tên đăng nhập hoặc mật khẩu sai");
           setOpen(true);
@@ -122,7 +136,7 @@ export default function Login() {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs">  
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>

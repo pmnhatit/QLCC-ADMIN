@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+
 import { useSelector } from "react-redux";
-import { handleData } from "./ServiceListBlock.js";
+import { handleData } from "../ListBrowsePost/ServiceListBrowsePost.js";
+
 import { useHistory } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
-
 import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from "@material-ui/core/Tooltip";
 import Fab from '@material-ui/core/Fab';
@@ -11,7 +12,8 @@ import styles from "../../../asset/jss/material-dashboard-react/components/tasks
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles(styles);
-export default function ListBlock() {
+
+export default function AcceptedBrowsePost() {
   const classes = useStyles();
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
@@ -41,27 +43,44 @@ export default function ListBlock() {
       },
     },
     {
-      name: "name",
-      label: "Tên phòng",
+      name: "title",
+      label: "Tiêu đề",
+      options: {
+        filter: true,
+        sort: false,
+      },
+    },
+    {
+      name: "content",
+      label: "Nội dung",
+      options: {
+        display: false,
+        filter: true,
+        sort: false,
+      },
+    },
+    {
+      name: "create_date",
+      label: "Ngày tạo",
       options: {
         filter: true,
         sort: false,
       },
     },
     // {
-    //   name: "block",
-    //   label: "Toà nhà",
+    //   name: "is_read_value",
+    //   label: "Tình trạng",
     //   options: {
-    //     filter: true,
+    //     filter: false,
     //     sort: false,
     //   },
     // },
-    
     {
       name: "",
       options: {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
+            
             <div>
             <Tooltip
             id="tooltip-top"
@@ -86,17 +105,47 @@ export default function ListBlock() {
     },
   ];
   const handleClick = (id) => {
-    // e.preventDefault();
-    console.log(id);
-    history.push(`/admin/block/detail/${id}`);
+
+    history.push(`/admin/browse_post/detail/${id}`);
+  };
+  const handleChangeStatus = async (id) => {
+    try {
+      const body=
+      {
+        notice_id: id,
+        admin_status: true
+      }
+    
+      console.log(body);
+      const res = await fetch(
+        process.env.REACT_APP_API_LINK + `/api/repair/admin/update-is-read`,
+        {
+          method: "PUT",
+          mode: "cors",
+          headers: {
+            Authorization: "Bearer " + `${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      if (res.status === 200) {
+        console.log("ok");
+     
+      } else {
+        console.log("SOMETHING WENT WRONG");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   useEffect(() => {
     const getRes = async () => {
-      const res1 = await fetch(
-        process.env.REACT_APP_API_LINK + `/api/block/all`,
+      const res = await fetch(
+        process.env.REACT_APP_API_LINK + `/api/post/all-post?status=1`,
         {
-          // get block
+          // get apart
           method: "GET",
           headers: {
             Authorization: "Bearer " + `${token}`,
@@ -104,15 +153,15 @@ export default function ListBlock() {
           },
         }
       );
-      if (res1.status === 200) {
+     
+      if (res.status === 200 ) {
         console.log("Vo 200OK");
-        
-        const result1 = await res1.json();
-        setData(handleData(result1.data));
-        console.log(result1.data);
+        const result = await res.json();
+        console.log(result.data);
+        setData(await handleData(result.data));
       } else {
-        const result1 = await res1.json();
-        alert(result1.message);
+        const result = await res.json();
+        alert(result.message);
       }
     };
     getRes();
@@ -120,7 +169,7 @@ export default function ListBlock() {
   return (
     <div>
       <MUIDataTable
-        title={"Danh sách tòa nhà "}
+        title={""}
         data={data}
         columns={columns}
         options={options}

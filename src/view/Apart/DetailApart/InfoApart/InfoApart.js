@@ -45,36 +45,12 @@ const useStyles = makeStyles((theme) => ({
     float: "right"
  }
 }));
-export default function InfoApart() {
+export default function InfoApart(props) {
   const classes = useStyles();
   const token = useSelector((state) => state.user.token);
- 
+  const {data}=props
 
-  useEffect(() => {
-    const getRes = async () => {
-      const res1 = await fetch(
-        process.env.REACT_APP_API_LINK + `/api/block/all`,
-        {
-          // get block
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + `${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (res1.status === 200) {
-        console.log("Vo 200OK");
-        const result1 = await res1.json();
-        console.log(result1.data);
-        // setData(await handleData(result.data, result1.data));
-      } else {
-        const result = await res1.json();
-        alert(result.message);
-      }
-    };
-    getRes();
-  }, []);
+ 
 
   return (
     <div>
@@ -91,7 +67,6 @@ export default function InfoApart() {
                   shrink: true,
                 }}
                 variant="outlined"
-                onChange={(e) => checkApartName(e.target.value)}
               />
             </GridItem>
             <GridItem xs={12} sm={12} md={3}>

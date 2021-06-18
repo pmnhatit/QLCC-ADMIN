@@ -20,9 +20,9 @@ export const handleData = (apart, block) => {
 const returnStatus = (status) => {
   switch (status) {
     case 1:
-      return "Còn trống";
+      return <div style ={{color:"green"}}>Còn trống</div>;
     case 2:
-      return "Đã bán";
+      return <div style ={{color:"red"}}>Đã bán</div>;
     default:
       return "";
   }
