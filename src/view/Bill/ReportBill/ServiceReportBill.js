@@ -1,3 +1,4 @@
+import NumberFormat from 'react-number-format';
 export const month = [
     { id: 1, name: "Tháng 1" },
     { id: 2, name: "Tháng 2" },
@@ -28,8 +29,9 @@ export const handleData = (data, apart) => {
           apart_id: data[i].apart_id,
           apart_name: data[i].apart_name, 
           time: data[i].month + "/" + data[i].year,
-          total_money: data[i].total_money,
-          is_pay: data[i].is_pay ?"Đã thanh toán":"Chưa thanh toán",    
+          total_money: <NumberFormat value={data[i].total_money} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
+          is_pay: data[i].is_pay ?"Đã thanh toán":"Chưa thanh toán",   
+          is_pay_value: data[i].is_pay ?(<div style={{color:"green"}}>Đã thanh toán</div> ):<div style={{color:"red"}}>Chưa thanh toán</div>, 
           flag:data[i].is_pay,
           image:data[i].image
         };

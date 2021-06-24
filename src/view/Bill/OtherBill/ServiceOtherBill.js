@@ -1,3 +1,4 @@
+import NumberFormat from 'react-number-format';
 export const handleData=(data,apart)=>
 {
     console.log(data);
@@ -10,14 +11,16 @@ export const handleData=(data,apart)=>
             id:data[i]._id,
             order: i + 1,
             time :data[i].month+"/"+data[i].year,
-            apart: returnApart(data[i].apart_id,apart),
-            apart_management:data[i].apart_management,
-            parking_fees:data[i].parking_fees,
-            maintenance_fee:data[i].maintenance_fee,
-            service_charge: data[i].service_charge,
+            apart: returnApart(data[i].apart_id,apart), 
+            apart_management:<NumberFormat value={data[i].apart_management} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
+            parking_fees:<NumberFormat value={data[i].parking_fees} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
+            maintenance_fee:<NumberFormat value={data[i].maintenance_fee} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
+            service_charge:<NumberFormat value={data[i].service_charge} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
             total_money: data[i].total_money,
+            total:<NumberFormat value={data[i].total_money} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
             note:data[i].note,
             is_pay: data[i].is_pay ?"Đã thanh toán":"Chưa thanh toán",//(<div style={{color:"green"}}>Đã thanh toán</div> ):<div style={{color:"red"}}>Chưa thanh toán</div>
+            is_pay_value: data[i].is_pay ?(<div style={{color:"green"}}>Đã thanh toán</div> ):<div style={{color:"red"}}>Chưa thanh toán</div>,
             flag:data[i].is_pay
         }} 
     }

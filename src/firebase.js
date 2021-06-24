@@ -2,13 +2,13 @@ import firebase from 'firebase/app';
  import 'firebase/messaging';
 
 const config = {
-    apiKey: "AIzaSyAhz-FnRZvOwHv8hNDzhhB2a54FHCg08YQ",
-    authDomain: "qlcc-admin.firebaseapp.com",
-    projectId: "qlcc-admin",
-    storageBucket: "qlcc-admin.appspot.com",
-    messagingSenderId: "870320054313",
-    appId: "1:870320054313:web:da6f3be6e8ae7187877c38",
-    measurementId: "G-WETER27L35"
+  apiKey: "AIzaSyAHfiiQQsaz-jWPZWrsLsTpSKCUhytJF7k",
+  authDomain: "apartment-management-8187f.firebaseapp.com",
+  projectId: "apartment-management-8187f",
+  storageBucket: "apartment-management-8187f.appspot.com",
+  messagingSenderId: "687231716945",
+  appId: "1:687231716945:web:7b3d5434e847f761ccf270",
+  measurementId: "G-M99LY2ZW7V"
 };
 
 firebase.initializeApp(config);
@@ -24,10 +24,10 @@ messaging.requestPermission().then(()=>{
   }).then(token_device=>{
     console.log( token_device)
   })
-messaging.onMessage(async (payload) => {
-    console.log('Message received. ', payload);
-    // ...
-  });
+// messaging.onMessage(async (payload) => {
+//     console.log('Message received. ', payload);
+//     // ...
+//   });
 
 // if ('serviceWorker' in navigator) {
 //     console.log("service");

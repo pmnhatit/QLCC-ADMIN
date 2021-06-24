@@ -10,12 +10,17 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
 
-
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
 const useStyles = makeStyles(styles);
 
 export default function ListAccepted() {
   const classes = useStyles();
   
+ const [openSnackBar,setOpenSnackBar]=useState(false);
+ const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false);
+
 
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
@@ -130,9 +135,28 @@ export default function ListAccepted() {
       },
 
   ];
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
 
   useEffect(() => {
+    handleOpenLoading()
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/register-service/all-register?status=1`,
         {
@@ -162,19 +186,29 @@ export default function ListAccepted() {
         //console.log(result.data);
         //console.log(result1.data);
         setData(await handleData(result.data, result1.data));
+        
+        handleCloseLoading()
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message); 
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+      }}
+      catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     };
     getRes();
   }, []);
   return (
+    <div><LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
       {isLoad && <div>Đang xử lý...</div>}
       <MUIDataTable
-        title={"Danh sách căn hộ "}
+        title={" "}
         data={data}
         columns={columns}
         options={options}
@@ -182,5 +216,7 @@ export default function ListAccepted() {
       </GridItem>
 
     </GridContainer>
+    </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar></div>
   );
 }

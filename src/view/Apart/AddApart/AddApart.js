@@ -182,7 +182,7 @@ export default function AddApart() {
     }
     else
     {
-        
+      addApart("");
     }
   };
   const upload = async (url,key) => {
@@ -252,6 +252,7 @@ export default function AddApart() {
   useEffect(() => {
     setIsLoad(true);
     const getRes = async () => {
+      try{
       const res1 = await fetch(
         process.env.REACT_APP_API_LINK + `/api/block/all`,
         {
@@ -276,8 +277,8 @@ export default function AddApart() {
         // setData(await handleData(result.data, result1.data));
       } else {
         const result = await res1.json();
-        alert(result.message);
-      }
+        console.log(result.message);
+      }}catch(err){}
     };
     getRes();
   }, []);

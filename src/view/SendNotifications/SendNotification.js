@@ -10,6 +10,7 @@ import GridContainer from "../../component/Grid/GridContainer.js";
 import Button from "../../component/CustomButtons/Button.js";
 import CustomTabs from "../../component/CustomTabs/CustomTabs.js";
 import CreateNotification from "./CreateNotification/CreateNotification.js"
+import ListNotification from "./ListNotification/ListNotification.js"
 const styles = {
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -42,7 +43,14 @@ export default function SendNotification() {
         <GridItem xs={12} sm={12} md={12}>
         <CustomTabs
             headerColor="primary"
-            tabs={[
+            tabs={[ 
+              {
+                tabName: "Danh sách thông báo",
+                //tabIcon: BugReport,
+                tabContent: (      
+                    <ListNotification/>
+                )
+              },
               {
                 tabName: "Tạo thông báo",
                 //tabIcon: BugReport,
@@ -50,13 +58,7 @@ export default function SendNotification() {
                     <CreateNotification/>
                 )
               },
-              // {
-              //   tabName: "Danh sách căn hộ",
-              //   //tabIcon: BugReport,
-              //   tabContent: (      
-              //       <ListApart/>
-              //   )
-              // },
+             
             //   {
             //     tabName: "Thêm căn hộ",
             //     //tabIcon: Code,

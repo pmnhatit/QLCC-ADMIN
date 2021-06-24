@@ -8,9 +8,16 @@ import Alert from "@material-ui/lab/Alert";
 import GridItem from "../../../component/Grid/GridItem.js";
 import GridContainer from "../../../component/Grid/GridContainer.js";
 import Button from "../../../component/CustomButtons/Button.js";
-import { handleRawApart } from "./ServiceAddUserAccount.js";
+import { handleApart } from "./ServiceAddUserAccount.js";
 import TextField from "@material-ui/core/TextField";
-
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import SearchApart from "../DetailUser/SearchApart.js"
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -40,13 +47,18 @@ const useStyles = makeStyles((theme) => ({
   alerts: {
     marginTop: "18px",
   },
+  myButton:{
+    float: "right"
+ }
+
 }));
 export default function ChangeProfile() {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const [isHandle, setIsHandle] = useState(false);
   const [isLoad, setIsLoad] = useState(true);
-  const [isLoadApart, setIsLoadApart] = useState(false);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+  const [isHandle,setIsHandle]=useState(false);
   //   const [content, setContent] = useState("");
   //   const userInfo = useSelector((state) => state.user.info);
   const nameCheck = /^[a-zA-Z0-9]+$/;
@@ -67,46 +79,45 @@ export default function ChangeProfile() {
   const [id_card, setId_card] = useState("");
   const [address, setAddress] = useState("");
   const [license_plates, setLicense_plates] = useState("");
-  const [block, setBlock] = useState("");
+  const [block_id, setBlock_id] = useState("");
   const [apart_id, setApart_id] = useState("");
-  const [blockList, setBlockList] = useState([]);
-  const [rawApartList, setRawApartList] = useState([]);
-  const [apartList, setApartList] = useState([]);
+  const [apartList, setApartList] = useState({list:[{name:"Không có căn hộ"}],default:[]});
 
-  const checkName = (name) => {
+  
+  const checkName = (name) => { 
+    setName(name);
     if (name !== "") {
       setAlertName(false);
-      setName(name);
       return true;
     } else {
       setAlertName(true);
       return false;
     }
   };
-  const checkPhone = (phone) => {
+  const checkPhone = (phone) => {  
+    setPhone(phone);
     if (phone !== "" && phone.match(phoneCheck)) {
       setAlertPhone(false);
-      setPhone(phone);
       return true;
     } else {
       setAlertPhone(true);
       return false;
     }
   };
-  const checkEmail = (email) => {
+  const checkEmail = (email) => {  
+     setEmail(email);
     if (email !== "" && email.match(emailCheck)) {
       setAlertEmail(false);
-      setEmail(email);
       return true;
     } else {
       setAlertEmail(true);
       return false;
     }
   };
-  const checkID_Card = (id_card) => {
+  const checkID_Card = (id_card) => {  
+     setId_card(id_card);
     if (id_card !== "" && id_card.match(nameCheck)) {
       setAlertID_Card(false);
-      setId_card(id_card);
       return true;
     } else {
       setAlertID_Card(true);
@@ -114,9 +125,9 @@ export default function ChangeProfile() {
     }
   };
   const checkAddress = (address) => {
-    if (address !== "") {
-      setAlertAddress(false);
+    if (address !== "") {  
       setAddress(address);
+      setAlertAddress(false);
       return true;
     } else {
       setAlertAddress(true);
@@ -124,9 +135,9 @@ export default function ChangeProfile() {
     }
   };
   const checkLicense_plates = (license_plates) => {
-    if (license_plates !== "") {
+    if (license_plates !== "") { 
+       setLicense_plates(license_plates);
       setAlertLicense_plates(false);
-      setLicense_plates(license_plates);
       return true;
     } else {
       setAlertLicense_plates(true);
@@ -134,32 +145,55 @@ export default function ChangeProfile() {
     }
   };
   const checkApart = (apart_id) => {
-    if (apart_id !== "") {
+    if (apart_id !== "") { 
+       setApart_id(apart_id);
       setAlertApart(false);
-      setApart_id(apart_id);
       return true;
     } else {
       setAlertApart(true);
       return false;
     }
   };
-  const handleChangeBlock = async (block_id) => {
-    setIsLoadApart(true);
-    setBlock(block_id);
-    const temp = await handleRawApart(block_id, rawApartList);
-    setApartList(temp);
-    setApart_id(temp[0]._id);
+  const changeData=async(apart)=>
+  {
+       let result=await handleApart(apart);
+       setApart_id(result.apart_id)
+       setBlock_id(result.block_id)
+  }
 
-    setIsLoadApart(false);
+  const handleClickOpen = () => {
+    setOpen(true);
   };
-  const handleSubmit = async () => {
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
     setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
+
+  const handleSubmit = async () => {
+    handleClose()
+    handleOpenLoading()
     if (
       checkName(name) &&
       checkPhone(phone) &&
       checkEmail(email) &&
       checkID_Card(id_card) &&
-      checkAddress(address)
+      checkAddress(address) && checkApart(apart_id)
     ) {
       const body = {
         name: name,
@@ -167,8 +201,8 @@ export default function ChangeProfile() {
         email: email,
         identify_card: id_card,
         native_place: address,
-        apartment_id: [apart_id], //["6061e00355f5a919c47d3586"]
-        block_id: [block], //["6051fc3a449d422710797e73"]
+        apartment_id: apart_id, //["6061e00355f5a919c47d3586"]
+        block_id: block_id, //["6051fc3a449d422710797e73"]
         license_plates: [license_plates], //["78N2-8668"]
       };
       console.log(body);
@@ -191,31 +225,30 @@ export default function ChangeProfile() {
 
           console.log("success");
           console.log(result);
-        } else if (res.status === 500) {
-        } else console.log("SOMETHING WENT WRONG");
+          handleCloseLoading()
+        handleOpenSnackBar(true);
+        }  else {
+          console.log("SOMETHING WENT WRONG")
+        handleCloseLoading()
+        handleOpenSnackBar(false);};
       } catch (err) {
         console.log(err);
+        handleCloseLoading()
+        handleOpenSnackBar(false);
       }
     } else {
+      handleCloseLoading()
+      handleOpenSnackBar(false);
     }
-    setIsHandle(false);
+    
   };
 
-  useEffect(() => {
+  useEffect(() => { 
+    handleOpenLoading()
     setIsLoad(true);
     const getRes = async () => {
+      try{
       const res = await fetch(
-        process.env.REACT_APP_API_LINK + `/api/block/all`,
-        {
-          // get content
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + `${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const res1 = await fetch(
         process.env.REACT_APP_API_LINK + `/api/apart/aparts-empty`,
         {
           // get content
@@ -226,33 +259,34 @@ export default function ChangeProfile() {
           },
         }
       );
-      if (res.status === 200 && res1.status === 200) {
+      if (res.status === 200) {
         console.log("Vo 200OK");
         const result = await res.json();
         console.log(result.data);
-        setBlockList(result.data);
-        setBlock(result.data[0]._id);
-        const result1 = await res1.json();
-        console.log(result1.data);
-        setRawApartList(result1.data);
-        const temp = await handleRawApart(result.data[0]._id, result1.data);
-        setApartList(temp);
-        setApart_id(temp[0]._id);
-
+        setApartList({list:result.data,default:[]})
         setIsLoad(false);
-
+        handleCloseLoading()
         // setData(await handleData(result.data, result1.data));
       } else {
-        const result = await res1.json();
+        const result = await res.json();
         alert(result.message);
-      }
+        handleCloseLoading()
+        handleOpenSnackBar(false);
+      }} catch (err) {
+      console.log(err); 
+      handleCloseLoading()
+      handleOpenSnackBar(false);
+     
+    }
+     
     };
     getRes();
   }, []);
 
   return (
     <div>
-      {!isLoad && (
+      <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
+   
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <GridContainer>
@@ -384,50 +418,10 @@ export default function ChangeProfile() {
                   </Alert>
                 )}
               </GridItem>
-              <GridItem xs={12} sm={12} md={9}>
-                <TextField
-                  id="outlined-select-currency-native"
-                  select
-                  label="Tòa nhà"
-                  margin="normal"
-                  defaultValue={blockList[0]}
-                  onChange={(e) => handleChangeBlock(e.target.value)}
-                  SelectProps={{
-                    native: true,
-                  }}
-                  fullWidth
-                  variant="outlined"
-                >
-                  {blockList.map((option) => (
-                    <option key={option._id} value={option._id}>
-                      {option.name}
-                    </option>
-                  ))}
-                </TextField>
-              </GridItem>
-              {!isLoadApart && (
-                <GridItem xs={12} sm={12} md={9}>
-                  <TextField
-                    id="outlined-select-currency-native"
-                    select
-                    label="Căn hộ"
-                    margin="normal"
-                    defaultValue={apartList[0]}
-                    onChange={(e) => checkApart(e.target.value)}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    fullWidth
-                    variant="outlined"
-                  >
-                    {apartList.map((option) => (
-                      <option key={option._id} value={option._id}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </TextField>
+                  {!isLoad && ( <GridItem xs={12} sm={12} md={9}>
+                <SearchApart data={apartList} changeData={changeData}></SearchApart>
                 </GridItem>
-              )}
+               )}
               <GridItem xs={12} sm={12} md={3}>
               {alertApart && (
                   <Alert className={classes.alerts} severity="error">
@@ -438,17 +432,44 @@ export default function ChangeProfile() {
 
               <GridItem xs={12} sm={12} md={6}>
              
-                {isHandle && <div>Đang xử lý, vui lòng chờ ...</div>}
+            
               </GridItem>
               <GridItem xs={12} sm={12} md={3}>
-                <Button color="primary" onClick={(e) => handleSubmit(e)}>
+                <Button className={classes.myButton} color="primary" onClick={(e) => handleClickOpen()}>
                   Lưu lại
                 </Button>
               </GridItem>
             </GridContainer>
           </GridItem>
         </GridContainer>
-      )}
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">
+                  Xác nhận chỉnh sửa
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+           
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={(e) => handleSubmit()} color="primary">
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </LoadingOverlay>
+     
+		
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
+
     </div>
   );
 }

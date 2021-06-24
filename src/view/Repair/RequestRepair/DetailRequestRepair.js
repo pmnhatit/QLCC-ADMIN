@@ -180,7 +180,7 @@ export default function DetailRequestRepair(props) {
           // setIsLoad(false);
         } else {
           const result = await res.json();
-          alert(result.message);
+          console.log(result.message);
         }
       } catch (err) {
         console.log(err);
@@ -228,7 +228,7 @@ export default function DetailRequestRepair(props) {
       return <div></div>;
     } else {
       return (
-        <Button color="primary" onClick={(e) => handleClickOpen(true)}>
+        <Button className={classes.myButton} color="primary" onClick={(e) => handleClickOpen(true)}>
           {data.next_status_value}
         </Button>
       );
@@ -267,7 +267,7 @@ export default function DetailRequestRepair(props) {
       setIsLoad(false);
     } else {
       const result = await res.json();
-      alert(result.message);
+      console.log(result.message);
     }
   };
   useEffect(() => {
@@ -296,7 +296,7 @@ export default function DetailRequestRepair(props) {
         setIsLoad(false);
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message);
       }
     };
     getRes();
@@ -314,7 +314,7 @@ export default function DetailRequestRepair(props) {
                     src={image}
                     alt="Không có ảnh"
                     width="400"
-                    height="auto"
+                    height="400"
                   />
                 </a>
               </CardAvatar>
@@ -499,7 +499,7 @@ export default function DetailRequestRepair(props) {
                   <img
                     src={commentImage}
                     alt="Không có ảnh"
-                    style={{ width: "50px", height: "50px" }}
+                    style={{ width: "100px", height: "100px" }}
                   ></img>
                 )}
               </GridItem>

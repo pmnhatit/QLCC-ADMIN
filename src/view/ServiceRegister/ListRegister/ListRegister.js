@@ -22,7 +22,8 @@ import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
 import LoadPlace from "./LoadPlace.js";
-
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
 const useStyles = makeStyles(styles);
 
 export default function ListRegister() {
@@ -32,7 +33,9 @@ export default function ListRegister() {
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
   const [isLoad,setIsLoad]=useState(false);
-
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false);
   const [service_id,setService_id]=useState("");
   const [serviceName,setServiceName]=useState("");
   const [draw_date,setDraw_date]=useState();
@@ -248,7 +251,7 @@ export default function ListRegister() {
   
   };
  // console.log(body);
-  handleChangeStatus(process.env.REACT_APP_API_LINK + `/api/register-service/update-confirm`,body, await getUser(selectRow[11]))
+  handleChangeStatus(selectRow[0],process.env.REACT_APP_API_LINK + `/api/register-service/update-confirm`,body, await getUser(selectRow[11]))
   }
   const handleDenied= async () => {
     handleClose1();
@@ -258,9 +261,10 @@ export default function ListRegister() {
       reason: reason
   
   };
-  handleChangeStatus(process.env.REACT_APP_API_LINK + `/api/register-service/update-reject`,body, await getUser(selectRow[11]))
+  handleChangeStatus(selectRow[0],process.env.REACT_APP_API_LINK + `/api/register-service/update-reject`,body, await getUser(selectRow[11]))
   }
-  const handleChangeStatus = async (url,body,token_device) => {
+  const handleChangeStatus = async (id,url,body,token_device) => {
+    handleOpenLoading();
     try {   
       console.log(body);
 
@@ -276,17 +280,35 @@ export default function ListRegister() {
           body: JSON.stringify(body),
         }
       );
-      if (res.status === 200) {
+      const res1 = await fetch(
+        process.env.REACT_APP_API_LINK + `/api/register-service/change-is-read`,
+        {
+          method: "PUT",
+          mode: "cors",
+          headers: {
+            Authorization: "Bearer " + `${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({register_id: id}),
+        }
+      );
+      if (res.status === 200&&res1.status === 200) {
        
         console.log("change ok");
         await PushNotification(token_device);
         setReloadPlace(!reloadPlace)
         //history.push(`/admin/reportbill`);
+        handleOpenSnackBar(true)
+        handleCloseLoading()
       } else {
         console.log("SOMETHING WENT WRONG");
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     } catch (err) {
       console.log(err);
+      handleOpenSnackBar(false)
+      handleCloseLoading()
     }
   };
   const PushNotification=async(token_device)=>
@@ -344,7 +366,7 @@ export default function ListRegister() {
       return result.data.token_device;
     } else {
       const result = await res.json();
-      alert(result.message);
+      console.log(result.message);
     }
 
   }
@@ -367,8 +389,27 @@ export default function ListRegister() {
       {console.log("chua chon dủ");
       setShow(false);}
   }
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
   useEffect(() => {
+    handleOpenLoading()
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/register-service/all-register?status=0`,
         {
@@ -398,19 +439,28 @@ export default function ListRegister() {
         //console.log(result.data);
         //console.log(result1.data);
         setData(await handleData(result.data, result1.data));
+        handleCloseLoading()
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+      }}
+      catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     };
     getRes();
   }, [reload]);
   return (
+  <div> <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
     <GridContainer>
       <GridItem xs={12} sm={12} md={10}>
       {isLoad && <div>Đang xử lý...</div>}
       <MUIDataTable
-        title={"Danh sách căn hộ "}
+        title={""}
         data={data}
         columns={columns}
         options={options}
@@ -473,6 +523,9 @@ export default function ListRegister() {
           </Button>
         </DialogActions>
       </Dialog>
-    </GridContainer>
+      
+    </GridContainer></LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
+    </div>
   );
 }

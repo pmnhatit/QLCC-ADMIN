@@ -142,7 +142,7 @@ export default function DetailPublicArea(props) {
           // setIsLoad(false);
         } else {
           const result = await res.json();
-          alert(result.message);
+          console.log(result.message);
         }
       } catch (err) {
         console.log(err);
@@ -192,7 +192,7 @@ export default function DetailPublicArea(props) {
       setIsLoad(false);
     } else {
       const result = await res.json();
-      alert(result.message);
+      console.log(result.message);
     }
 
   }
@@ -221,7 +221,7 @@ export default function DetailPublicArea(props) {
         setIsLoad(false);
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message);
       }
     };
     getRes();
@@ -235,7 +235,7 @@ export default function DetailPublicArea(props) {
             <Card profile>
               <CardAvatar>
                 <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                  <img src={image} alt="Không có ảnh" width="400" height="auto" />
+                  <img src={image} alt="Không có ảnh" width="400" height="400" />
                 </a>
               </CardAvatar>
             </Card>
@@ -315,7 +315,7 @@ export default function DetailPublicArea(props) {
                   defaultValue={data.content}
                   //onChange={(e) => setName(e.target.value)}
                 />
-                <TextField
+                {/* <TextField
                   id="is_pay"
                   label="Trạng thái hiện tại"
                   //style={{ margin: 8 }}
@@ -327,7 +327,7 @@ export default function DetailPublicArea(props) {
                   variant="outlined"
                   defaultValue={ data.status_value }
                   //onChange={(e) => setName(e.target.value)}
-                ></TextField>
+                ></TextField> */}
               </GridItem>
             </GridContainer>
           </GridItem>

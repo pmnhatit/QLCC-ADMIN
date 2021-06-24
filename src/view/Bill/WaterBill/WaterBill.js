@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { handleData, calTotal, calFilter } from "./ServiceWaterBill";
 import { makeStyles } from "@material-ui/core/styles";
-import Button from "../../../component/CustomButtons/Button.js"
 //import { useHistory } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
+import React, { useEffect, useState } from "react";
+import LoadingOverlay from "react-loading-overlay";
+import NumberFormat from 'react-number-format';
+import { useSelector } from "react-redux";
 import GridContainer from "../../../component/Grid/GridContainer";
 import GridItem from "../../../component/Grid/GridItem";
-
+import Snackbar from "../../../component/SnackBar/Snackbar.js";
+import { calTotal, handleData } from "./ServiceWaterBill";
 const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1),
@@ -20,35 +21,20 @@ export default function WaterBill(props) {
   const token = useSelector((state) => state.user.token);
   const {selectMonth,selectYear,reLoad}=props;
   const [data, setData] = useState([]);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false);
   const [statis, setStatis] = useState({
     total: 0,
     total_pay: 0,
     total_not_pay: 0,
   });
-  const [statisChange, setStatisChange] = useState({
-    total: 0,
-    total_pay: 0,
-    total_not_pay: 0,
-  });
+
   const options = {
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
-    onTableChange: (action, tableState) => {
-      console.log(action, tableState);
 
-      // a developer could react to change on an action basis or
-      // examine the state as a whole and do whatever they want
-
-      switch (action) {
-        case "filterChange"://,"search"
-          console.log(calFilter(tableState.displayData));
-          setStatisChange(calFilter(tableState.displayData));
-
-          break;
-        default:
-      }
-    },
   };
   const columns = [
     {
@@ -80,6 +66,7 @@ export default function WaterBill(props) {
       name: "time",
       label: "Thời gian",
       options: {
+        display: false,
         filter: false,
         sort: false,
       },
@@ -112,7 +99,7 @@ export default function WaterBill(props) {
     },
 
     {
-      name: "total_money",
+      name: "total",
       label: "Tổng giá",
       options: {
         filter: false,
@@ -121,8 +108,9 @@ export default function WaterBill(props) {
     },
     {
       name: "is_pay",
-      label: "Tình trạng",
+      label: "Tình trạng.",
       options: {
+        display: "excluded",
         filter: true,
         sort: false,
       },
@@ -136,42 +124,40 @@ export default function WaterBill(props) {
         sort: false,
       },
     },
+    {
+      name: "is_pay_value",
+      label: "Tình trạng",
+      options: {
+        
+        filter: false,
+        sort: false,
+      },
+    },
 
-    // {
-    //   name: "",
-    //   options: {
-    //     customBodyRender: (value, tableMeta, updateValue) => {
-    //       return (
-    //         <div>
-    //         <Button
-    //           //className={classes.button}
-    //           //variant="outlined"
-    //           color="primary"
-    //           onClick={() => handleClick(tableMeta.rowData[0])}>
-    //           Chi tiết
-    //         </Button>
-
-    //          <Button
-    //           className={classes.button}
-    //          //variant="outlined"
-    //          color="danger"
-    //          onClick={() => handleClick(tableMeta.rowData[0])}>
-    //          Xóa
-    //        </Button>
-    //        </div>
-    //       );
-    //     },
-    //   },
-    // },
   ];
-  const handleClick = (id) => {
-    console.log(id);
-    //history.push(`/userdetails/${id}`);
+
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
   };
-
-
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
   useEffect(() => {
+    handleOpenLoading()
     const getRes = async () => {
+      
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/water-bill/all/${selectMonth}/${selectYear}`,
         {
@@ -200,49 +186,42 @@ export default function WaterBill(props) {
         const result1 = await res1.json();
         setData(await handleData(result.data,result1.data));
         setStatis(calTotal(result.data));
-       
+        handleCloseLoading()
       } else {
         const result = await res.json();
         alert(result.message);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+      }}
+      catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     };
     getRes();
   }, [reLoad]);
   return (
+    <div><LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
     <GridContainer>
     <GridContainer xs={12} sm={12} md={12}>
-      <GridItem xs={12} sm={12} md={3}>
-        <div>Thông kê toàn dữ liệu</div>
-      </GridItem>
-      <GridItem xs={12} sm={12} md={3}>
-        <div>Tổng tiền : {statis.total}</div>
-      </GridItem>
-      <GridItem xs={12} sm={12} md={3}>
-        <div style={{ color: "green" }}>Tiền đã thu : {statis.total_pay}</div>
-      </GridItem>
-      <GridItem xs={12} sm={12} md={3}>
-        <div style={{ color: "red" }}>
-          Tiền còn lại: {statis.total_not_pay}
-        </div>
-      </GridItem>
-    </GridContainer>
+        <GridItem xs={12} sm={12} md={3}>
+          <h3 style={{marginLeft:"30px"}}>Thông kê tháng</h3>
+        </GridItem>
+        <GridItem xs={12} sm={12} md={3}>
+          <h3>Tổng tiền : {<NumberFormat value={statis.total} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />}</h3>
+        </GridItem>
+        <GridItem xs={12} sm={12} md={3}>
+          <h3 style={{ color: "green" }}>Tiền đã thu : {<NumberFormat value={statis.total_pay} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />}</h3>
+        </GridItem>
+        <GridItem xs={12} sm={12} md={3}>
+          <h3 style={{ color: "red" }}>
+            Tiền còn lại: {<NumberFormat value={statis.total_not_pay} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />}
+          </h3>
+        </GridItem>
+      </GridContainer>
 
-    {/* <GridContainer xs={12} sm={12} md={12}>
-      <GridItem xs={12} sm={12} md={3}>
-        <div>Thông kê dữ liệu đã lọc</div>
-      </GridItem>
-      <GridItem xs={12} sm={12} md={3}>
-        <div>Tổng tiền : {statisChange.total}</div>
-      </GridItem>
-      <GridItem xs={12} sm={12} md={3}>
-        <div style={{ color: "green" }}>Tiền đã thu : {statisChange.total_pay}</div>
-      </GridItem>
-      <GridItem xs={12} sm={12} md={3}>
-        <div style={{ color: "red" }}>
-          Tiền còn lại: {statisChange.total_not_pay}
-        </div>
-      </GridItem>
-    </GridContainer> */}
+    
 
     <GridItem xs={12} sm={12} md={12}>
       <MUIDataTable
@@ -253,5 +232,8 @@ export default function WaterBill(props) {
       />
     </GridItem>
   </GridContainer>
+  </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
+  </div>
   );
 }

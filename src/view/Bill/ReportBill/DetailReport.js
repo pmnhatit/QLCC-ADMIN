@@ -9,9 +9,11 @@ import GridContainer from "../../../component/Grid/GridContainer.js";
 import CardHeader from "../../../component/Card/CardHeader.js";
 import Button from "../../../component/CustomButtons/Button.js";
 import Card from "../../../component/Card/Card.js";
-import CardAvatar from "../../../component/Card/CardAvatar.js";
 
+import SlideShow from "../../../component/SlideShow/SlideShow.js"
 import TextField from "@material-ui/core/TextField";
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -19,14 +21,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useParams, useHistory } from "react-router-dom";
+import NumberFormat from 'react-number-format';
 const useStyles = makeStyles((theme) => ({
-  cardCategoryWhite: {
-    color: "rgba(255,255,255,.62)",
-    margin: "0",
-    fontSize: "14px",
-    marginTop: "0",
-    marginBottom: "0",
-  },
+
   cardTitleWhite: {
     color: "#FFFFFF",
     marginTop: "0px",
@@ -45,6 +42,10 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
     width: "25ch",
   },
+  myButton:{
+    float: "right",
+    width:"200px"
+ }
 }));
 export default function DetailReport(props) {
   //const dispatch = useDispatch();
@@ -61,17 +62,21 @@ export default function DetailReport(props) {
     water_bill: 0,
     year: 0,
   });
-  const [isError, setIsError] = useState(false);
-  const [image, setImage] = useState();
+  
+  const [image, setImage] = useState([]);
   const [isLoad, setIsLoad] = useState(true);
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState(true); // true:chấp nhận|| false:không chấp nhận
-  //   const token = useSelector((state) => state.user.token);
+  const [selected, setSelected] = useState(true);// true:chấp nhận|| false:không chấp nhận
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false); 
+const [reload,setReload]=useState(true);
+
 
   const handleSubmit = async () => {
-    console.log("submit");
     handleClose();
     let body = {};
+    handleOpenLoading()
     try {
       if (selected)
         body = {
@@ -103,17 +108,23 @@ export default function DetailReport(props) {
       if (res.status === 200) {
         //const result = await res.json();
         console.log("ok");
-        setIsError(false);
-        await handleChangeReport();
-        if (selected) handleChangeStatus();
-        else history.push(`/admin/reportbill`)
-        
+        if(await handleChangeReport()){
+          if (selected) await handleChangeStatus();
+          // else history.push(`/admin/reportbill`)
+            setReload(!reload)
+            handleCloseLoading()
+        }
+        else{ handleOpenSnackBar(false)
+          handleCloseLoading()}
       } else {
         console.log("SOMETHING WENT WRONG");
-        setIsError(true);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     } catch (err) {
       console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
     }
   };
   const handleChangeStatus = async () => {
@@ -138,15 +149,20 @@ export default function DetailReport(props) {
       if (res.status === 200) {
         //const result = await res.json();
         console.log("ok");
-        setIsError(false);
-        //setReload(!reload);
-        history.push(`/admin/reportbill`);
+        handleOpenSnackBar(true)
+        handleCloseLoading()
+        return true
       } else {
         console.log("SOMETHING WENT WRONG");
-        setIsError(true);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+        return false
       }
     } catch (err) {
       console.log(err);
+      handleOpenSnackBar(false)
+      handleCloseLoading()
+      
     }
   };
   const handleChangeReport = async () => {
@@ -171,22 +187,54 @@ export default function DetailReport(props) {
       if (res.status === 200) {
         //const result = await res.json();
         console.log("ok");
-        setIsError(false);
-        //setReload(!reload);
+        return true;
         
       } else {
         console.log("SOMETHING WENT WRONG");
-        setIsError(true);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+        return false
       }
     } catch (err) {
       console.log(err);
+      handleOpenSnackBar(false)
+      handleCloseLoading()
+      return false
     }
   };
+  
+  const handleClickOpen = (temp) => {
+    setSelected(temp);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
   const getUrl = async (key) => {
-    if (key.length > 0) {
+    let temp=[];
+    if (key.length >= 1) {
       try {
-        const res = await fetch(
-          process.env.REACT_APP_API_LINK + `/api/uploadv2/image-url?key=${key}`,
+        for (let i=0;i<key.length;i++)
+       { const res = await fetch(
+          process.env.REACT_APP_API_LINK + `/api/uploadv2/image-url?key=${key[i]}`,
           {
             // get apart
             method: "GET",
@@ -198,30 +246,24 @@ export default function DetailReport(props) {
         );
         if (res.status === 200) {
           const result = await res.json();
-          console.log("Vo 200OK");
-          setImage(result.imageUrl);
-          //console.log(result.imageUrl);
-          setIsLoad(false);
+          console.log("get url ok");
+          temp[i]={value:result.imageUrl};
         } else {
-          const result = await res.json();
-          alert(result.message);
-        }
+          handleOpenSnackBar(false)
+        }}
+        console.log(temp);
+        return temp;
       } catch (err) {
         console.log(err);
+        handleOpenSnackBar(false)
       }
     }
-    setIsLoad(false);
-  };
-  const handleClickOpen = (temp) => {
-    setSelected(temp);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
+    else
+   return [""]
   };
   useEffect(() => {
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/all-bill/${id}`,
         {
@@ -239,26 +281,28 @@ export default function DetailReport(props) {
         console.log("Vo 200OK");
         console.log(result.data);
         setData(result.data);
-        getUrl(result.data.image);
+        setImage(await getUrl(await result.data.image));
+        setIsLoad(false);
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message);
+        handleOpenSnackBar(false)  
+      }}catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
       }
     };
     getRes();
-  }, []);
+  }, [reload]);
 
   return (
     <div>
+       <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       {!isLoad ? (
         <GridContainer>
           <GridItem xs={12} sm={12} md={5}>
             <Card profile>
-              <CardAvatar>
-                <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                  <img src={image} alt="..." width="400" height="auto" />
-                </a>
-              </CardAvatar>
+            <SlideShow  images={image}></SlideShow>
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={7}>
@@ -303,10 +347,9 @@ export default function DetailReport(props) {
                   //onChange={(e) => setName(e.target.value)}
                 />
 
-                <TextField
+<NumberFormat value={data.electric_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => <TextField
                   id="elec"
                   label="Hóa đơn điện"
-                  //style={{ margin: 8 }}
                   fullWidth
                   margin="normal"
                   InputLabelProps={{
@@ -316,13 +359,11 @@ export default function DetailReport(props) {
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.electric_bill}
-                  //onChange={(e) => setName(e.target.value)}
-                />
-                <TextField
+                  defaultValue={value}
+                />} />
+                <NumberFormat value={data.water_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) =>  <TextField
                   id="water"
                   label="Hóa đơn nước"
-                  //style={{ margin: 8 }}
                   fullWidth
                   margin="normal"
                   InputLabelProps={{
@@ -332,10 +373,9 @@ export default function DetailReport(props) {
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.water_bill}
-                  //onChange={(e) => setName(e.target.value)}
-                />
-                <TextField
+                  defaultValue={value}
+                />} />
+               <NumberFormat value={data.other_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) =>  <TextField
                   id="other"
                   label="Hóa đơn khác"
                   //style={{ margin: 8 }}
@@ -348,10 +388,10 @@ export default function DetailReport(props) {
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.other_bill}
-                  //onChange={(e) => setName(e.target.value)}
-                />
-                <TextField
+                  defaultValue={value}
+                />} />
+               <NumberFormat value={data.total_money} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) =>  
+               <TextField
                   id="total"
                   label="Tổng tiền"
                   //style={{ margin: 8 }}
@@ -364,9 +404,9 @@ export default function DetailReport(props) {
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.total_money}
+                  defaultValue={value}
                   //onChange={(e) => setName(e.target.value)}
-                />
+                />} />
                 <TextField
                   id="is_pay"
                   label="Tình trạng"
@@ -391,20 +431,14 @@ export default function DetailReport(props) {
           <div />
           <GridItem xs={12} sm={12} md={3} />
           <GridItem xs={12} sm={12} md={3}>
-            {/* {isHandle && (
-            <div style={{ marginTop: "15px" }}>Đang xử lý, vui lòng chờ...</div>
-          )}*/}
-            {isError && (
-              <div style={{ marginTop: "15px" }}>Vui lòng thử lại</div>
-            )}
           </GridItem>
           <GridItem xs={12} sm={12} md={6}>
             {data.report ? (
               <>
-                <Button color="primary" onClick={(e) => handleClickOpen(true)}>
+                <Button  className={classes.myButton} color="primary" onClick={(e) => handleClickOpen(true)}>
                   Chấp nhận
                 </Button>
-                <Button color="primary" onClick={(e) => handleClickOpen(false)}>
+                <Button  className={classes.myButton} color="primary" onClick={(e) => handleClickOpen(false)}>
                   Không chấp nhận
                 </Button>
               </>
@@ -428,8 +462,7 @@ export default function DetailReport(props) {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Căn hộ: {data.apart_name}
-            Tổng tiền: {data.total_money}
+            <div>Căn hộ: {data.apart_name}</div>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -441,6 +474,9 @@ export default function DetailReport(props) {
           </Button>
         </DialogActions>
       </Dialog>
+
+     </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

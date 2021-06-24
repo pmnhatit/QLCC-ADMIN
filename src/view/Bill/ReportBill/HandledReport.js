@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { handleData, month, year } from "./ServiceReportBill.js";
+import Fab from '@material-ui/core/Fab';
 import { makeStyles } from "@material-ui/core/styles";
-import GridItem from "../../../component/Grid/GridItem.js";
-import GridContainer from "../../../component/Grid/GridContainer.js";
 import TextField from "@material-ui/core/TextField";
-import Button from "../../../component/CustomButtons/Button.js";
-import { useHistory } from "react-router-dom";
+import Tooltip from "@material-ui/core/Tooltip";
+import EditIcon from '@material-ui/icons/Edit';
 import MUIDataTable from "mui-datatables";
+import React, { useEffect, useState } from "react";
+import LoadingOverlay from "react-loading-overlay";
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import GridContainer from "../../../component/Grid/GridContainer.js";
+import GridItem from "../../../component/Grid/GridItem.js";
+import Snackbar from "../../../component/SnackBar/Snackbar.js";
+import { createTimeChoice } from "../BillService.js";
+import { handleData } from "./ServiceReportBill.js";
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -20,6 +25,10 @@ export default function HandledReport(props) {
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
   //   const { selectMonth, selectYear, reLoad } = props;
+  const {month,year}= createTimeChoice()  
+  const [isHandle,setIsHandle]=useState(false);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
   const date = new Date();
   const currentMonth = date.getMonth();
   const currentYear = date.getFullYear();
@@ -77,9 +86,18 @@ export default function HandledReport(props) {
     },
     {
       name: "is_pay",
+      label: "Tình trạng.",
+      options: {
+        display: "excluded",
+        filter: true,
+        sort: false,
+      },
+    },
+    {
+      name: "is_pay_value",
       label: "Tình trạng",
       options: {
-        filter: true,
+        filter: false,
         sort: false,
       },
     },
@@ -90,23 +108,22 @@ export default function HandledReport(props) {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <div>
-              <Button
-                //className={classes.button}
-                //variant="outlined"
-                color="primary"
-                onClick={() => handleClick(tableMeta.rowData[0])}
-              >
-                Chi tiết
-              </Button>
-
-              {/* <Button
-                className={classes.button}
-                //variant="outlined"
-                color="danger"
-                onClick={() => handleClick(tableMeta.rowData[0])}
-              >
-                Xóa
-              </Button> */}
+              <Tooltip
+            id="tooltip-top"
+            title="Chi tiết"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <Fab
+              size="small"
+              color="red"
+              aria-label="add"
+              className={classes.margin}
+              onClick={() => handleClick(tableMeta.rowData[0])}
+            >
+              <EditIcon color="primary"/>
+            </Fab>
+          </Tooltip>
             </div>
           );
         },
@@ -126,8 +143,28 @@ export default function HandledReport(props) {
      setSelectYear(year)
     setReload(!reload);
    }
+   const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
+  
+ const handleOpenSnackBar = (type) => {
+  if (type) setSnackType(true);
+  else setSnackType(false);
+  setOpenSnackBar(true);
+};
+const handleCloseSnackBar = (event, reason) => {
+  if (reason === 'clickaway') {
+    return;
+  }
+  setOpenSnackBar(false);
+};
   useEffect(() => {
+    handleOpenLoading()
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK +
           `/api/all-bill/all-resolved/${selectMonth}/${selectYear}`,
@@ -146,16 +183,25 @@ export default function HandledReport(props) {
         console.log("Vo 200OK");
         console.log(result);
         setData(await handleData(result.data));
+        handleCloseLoading()
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+      }}
+      catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     };
     getRes();
   }, [reload]);
-  return (
+  return ( 
+  <div>
+    <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
     <GridContainer>
-     
         <GridItem xs={12} sm={12} md={3}>
           <TextField
             id="outlined-select-currency-native"
@@ -205,6 +251,11 @@ export default function HandledReport(props) {
         options={options}
       />
       </GridItem>
-    </GridContainer>
+     
+    
+    </GridContainer> 
+    </LoadingOverlay>
+      <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
+    </div>
   );
 }

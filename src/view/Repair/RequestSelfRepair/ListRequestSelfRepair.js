@@ -1,18 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { handleData } from "../ServiceRepair.js";
-import Button from "@material-ui/core/Button";
-import CustomButton from "../../../component/CustomButtons/Button.js"
-import { useHistory } from "react-router-dom";
+import Fab from '@material-ui/core/Fab';
+import { makeStyles } from "@material-ui/core/styles";
+import Tooltip from "@material-ui/core/Tooltip";
+import EditIcon from '@material-ui/icons/Edit';
 import MUIDataTable from "mui-datatables";
-import GridItem from "../../../component/Grid/GridItem.js";
-import GridContainer from "../../../component/Grid/GridContainer.js";
+import React, { useEffect, useState } from "react";
+import LoadingOverlay from "react-loading-overlay";
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
+import Snackbar from "../../../component/SnackBar/Snackbar.js";
+import { handleData } from "../ServiceRepair.js";
 
+const useStyles = makeStyles(styles);
 export default function LinkRequestRepair(props) {
+  const classes = useStyles();
   const history = useHistory();
   const {type,status}=props;
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false);
 
   const options = {
     filterType: "dropdown",
@@ -75,13 +83,24 @@ export default function LinkRequestRepair(props) {
       options: {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
-            <CustomButton
-              variant="outlined"
-              color="primary"
+            <div>
+            <Tooltip
+            id="tooltip-top"
+            title="Chi tiết"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <Fab
+              size="small"
+              color="red"
+              aria-label="add"
+              className={classes.margin}
               onClick={() => handleClick(tableMeta.rowData[0],tableMeta.rowData[4])}
             >
-              Chi tiết
-            </CustomButton>
+              <EditIcon color="primary"/>
+            </Fab>
+          </Tooltip>
+           </div>
           );
         },
       },
@@ -124,8 +143,28 @@ export default function LinkRequestRepair(props) {
       console.log(err);
     }
   };
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
+
   useEffect(() => {
+    handleOpenLoading()
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/repair/notices?type=${type}&status=${status}`,
         {
@@ -154,21 +193,29 @@ export default function LinkRequestRepair(props) {
         const result1 = await res1.json();
         console.log(result.data);
         setData(await handleData(result.data, result1.data));
+        handleCloseLoading()
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+      }}catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     };
     getRes();
   }, []);
   return (
-    <div>
+    <div> <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       <MUIDataTable
-        title={"Danh sách căn hộ "}
+        title={""}
         data={data}
         columns={columns}
         options={options}
-      />
+      /></LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

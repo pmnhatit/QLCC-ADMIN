@@ -10,6 +10,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Fab from '@material-ui/core/Fab';
 import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
 import { makeStyles } from "@material-ui/core/styles";
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
 
 const useStyles = makeStyles(styles);
 
@@ -18,6 +20,9 @@ export default function ListBrowsePost() {
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false);
 
   const options = {
     filterType: "dropdown",
@@ -104,21 +109,20 @@ export default function ListBrowsePost() {
       },
     },
   ];
-  const handleClick = (id) => {
-
+  const handleClick = async(id) => {
+    await handleChangeStatus(id)
     history.push(`/admin/browse_post/detail/${id}`);
   };
   const handleChangeStatus = async (id) => {
+  
     try {
       const body=
       {
-        notice_id: id,
-        admin_status: true
+        post_id: id
       }
-    
       console.log(body);
       const res = await fetch(
-        process.env.REACT_APP_API_LINK + `/api/repair/admin/update-is-read`,
+        process.env.REACT_APP_API_LINK + `/api/post/change-is-read`,
         {
           method: "PUT",
           mode: "cors",
@@ -131,17 +135,37 @@ export default function ListBrowsePost() {
       );
       if (res.status === 200) {
         console.log("ok");
+        
      
       } else {
         console.log("SOMETHING WENT WRONG");
+        
       }
     } catch (err) {
       console.log(err);
     }
   };
-
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
   useEffect(() => {
+    handleOpenLoading()
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/post/all-post?status=0`,
         {
@@ -159,21 +183,31 @@ export default function ListBrowsePost() {
         const result = await res.json();
         console.log(result.data);
         setData(await handleData(result.data));
+        handleCloseLoading()
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message)
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+      }}catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     };
     getRes();
   }, []);
   return (
     <div>
+      <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       <MUIDataTable
         title={""}
         data={data}
         columns={columns}
         options={options}
       />
+      </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

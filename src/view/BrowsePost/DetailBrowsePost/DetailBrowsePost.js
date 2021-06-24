@@ -20,7 +20,8 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useParams, useHistory } from "react-router-dom";
 import { handleData, title, content } from "./ServiceDetailBrowsePost.js";
-
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -48,7 +49,8 @@ const useStyles = makeStyles((theme) => ({
     width: "25ch",
   },
   myButton:{
-    width:"150px",
+    float: "right",
+    width:"200px"
   }
 }));
 export default function DetailRequestSelfRepair() {
@@ -75,6 +77,8 @@ export default function DetailRequestSelfRepair() {
   const [open1, setOpen1] = useState(false);
   const [reason, setReason] = useState();
   const [reload, setReload] = useState(false);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
 
   const [selected, setSelected] = useState(true); // true:chấp nhận|| false:không chấp nhận
   //   const token = useSelector((state) => state.user.token);
@@ -83,6 +87,7 @@ export default function DetailRequestSelfRepair() {
   const handleChangeStatus = async (status) => {
     handleClose();
     handleClose1();
+    handleOpenLoading()
     let body = {};
     let url = ``;
     try { 
@@ -120,15 +125,20 @@ export default function DetailRequestSelfRepair() {
         console.log("ok");
         console.log(result.data)
         await PushNotification();
-        setIsError(false);
         setReload(!reload);
+        handleOpenSnackBar(true)
+        handleCloseLoading()
         //history.push(`/admin/reportbill`);
       } else {
         console.log("SOMETHING WENT WRONG");
-        setIsError(true);
+        
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     } catch (err) {
       console.log(err);
+      handleOpenSnackBar(false)
+      handleCloseLoading()
     }
   };
   const PushNotification = async () => {
@@ -187,14 +197,16 @@ export default function DetailRequestSelfRepair() {
           temp[i]={value:result.imageUrl};
         } else {
           const result = await res.json();
-          alert(result.message);
+        console.log(result.message);
+       
         }}
         console.log(temp);
         return temp;
       } catch (err) {
         console.log(err);
+      
       }
-    }
+    }else return [""]
     setIsLoad(false);
   };
   const handleClickOpen = () => {
@@ -211,6 +223,7 @@ export default function DetailRequestSelfRepair() {
   };
 
   const getUser = async (data) => {
+    try{
     const res = await fetch(
       process.env.REACT_APP_API_LINK + `/api/user/${data.user_id}`,
       {
@@ -232,12 +245,34 @@ export default function DetailRequestSelfRepair() {
       setIsLoad(false);
     } else {
       const result = await res.json();
-      alert(result.message);
+      console.log(result.message);
+      handleOpenSnackBar(false)
+    }}catch (err) {
+      console.log(err);
+      handleOpenSnackBar(false)
     }
   };
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
   useEffect(() => {
     const getRes = async () => {
       setIsLoad(true);
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/post/all-post?_id=${id}`,
         {
@@ -253,22 +288,31 @@ export default function DetailRequestSelfRepair() {
       if (res.status === 200) {
         const result = await res.json();
         console.log("Vo 200OK");
-        console.log(result.data[0]);
+        console.log(result.data[0].images);
         await getUser(result.data[0]);
         if (result.data[0].images!==[])
           setImage(await getUrl(result.data[0].images));
 
         setIsLoad(false);
+      
+     
       } else {
         const result = await res.json();
-        alert(result.message);
+      console.log(result.message);
+      handleOpenSnackBar(false)
+      
       }
+    }catch (err) {
+      console.log(err);
+      handleOpenSnackBar(false)
+     
+    }
     };
     getRes();
   }, [reload]);
 
   return (
-    <div>
+    <div> <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       {!isLoad ? (
         <GridContainer>
           <GridItem xs={12} sm={12} md={5}>
@@ -306,6 +350,7 @@ export default function DetailRequestSelfRepair() {
                     shrink: true,
                     readOnly: true,
                   }}
+                  multiline={true}
                   variant="outlined"
                   defaultValue={data.content}
                   //onChange={(e) => setName(e.target.value)}
@@ -354,20 +399,7 @@ export default function DetailRequestSelfRepair() {
                   defaultValue={data.contact}
                   //onChange={(e) => setName(e.target.value)}
                 />
-                <TextField
-                  id="content"
-                  label="Nội dung"
-                  //style={{ margin: 8 }}
-                  fullWidth
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: true,
-                    readOnly: true,
-                  }}
-                  variant="outlined"
-                  defaultValue={data.content}
-                  //onChange={(e) => setName(e.target.value)}
-                />
+                
                 <TextField
                   id="status"
                   label="Trạng thái hiện tại"
@@ -387,18 +419,9 @@ export default function DetailRequestSelfRepair() {
           </GridItem>
           <div />
           <GridItem xs={12} sm={12} md={3} />
-          <GridItem xs={12} sm={12} md={4}>
-            {isHandle && (
-              <div style={{ marginTop: "15px" }}>
-                Đang xử lý, vui lòng chờ...
-              </div>
-            )}
-            {isError && (
-              <div style={{ marginTop: "15px" }}>Vui lòng thử lại</div>
-            )}
-          </GridItem>
+          
           {data.status === 0 && (
-            <GridItem xs={12} sm={12} md={5}>
+            <GridItem xs={12} sm={12} md={9}>
               <Button
                 className={classes.myButton}
                 color="primary"
@@ -474,6 +497,9 @@ export default function DetailRequestSelfRepair() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

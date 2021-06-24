@@ -2,25 +2,27 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { makeStyles } from "@material-ui/core/styles";
-import MyButton from "../../../component/CustomButtons/Button.js";
+import Button from "../../../component/CustomButtons/Button.js";
 import { useHistory } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import GridContainer from "../../../component/Grid/GridContainer";
 import GridItem from "../../../component/Grid/GridItem";
 import { handleData, calTotal} from "./ServiceAllBill";
-import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import EditIcon from '@material-ui/icons/Edit';
-import Close from "@material-ui/icons/Close";
-import Check from "@material-ui/icons/Check";
 import Tooltip from "@material-ui/core/Tooltip";
 import Fab from '@material-ui/core/Fab';
-import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
+import Close from "@material-ui/icons/Close";
+import Check from "@material-ui/icons/Check";
 
+import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
+import NumberFormat from 'react-number-format';
 const useStyles = makeStyles(styles);
 
 export default function AllBill(props) {
@@ -30,6 +32,9 @@ export default function AllBill(props) {
   const { selectMonth, selectYear, reLoad } = props;
   const [data, setData] = useState([]);
   const [open,setOpen]=useState(false);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false);
   const [selectedRow,setSelectRow]=useState([null, 0, null, null, 0, 0, 0, 0, null, false]);
   const [reload2,setReload2]=useState(true);
   const [statis, setStatis] = useState({
@@ -72,12 +77,13 @@ export default function AllBill(props) {
       name: "time",
       label: "Thời gian",
       options: {
+        display: false,
         filter: false,
         sort: false,
       },
     },
     {
-      name: "electric_bill",
+      name: "electric",
       label: "Tiền điện",
       options: {
         display: false,
@@ -86,7 +92,7 @@ export default function AllBill(props) {
       },
     },
     {
-      name: "water_bill",
+      name: "water",
       label: "Tiền nước",
       options: {
         display: false,
@@ -95,7 +101,7 @@ export default function AllBill(props) {
       },
     },
     {
-      name: "other_bill",
+      name: "other",
       label: "Chi phí khác",
       options: {
         display: false,
@@ -105,7 +111,7 @@ export default function AllBill(props) {
     },
 
     {
-      name: "total_money",
+      name: "total",
       label: "Tổng tiền",
       options: {
         filter: false,
@@ -114,8 +120,9 @@ export default function AllBill(props) {
     },
     {
       name: "is_pay",
-      label: "Tình trạng",
+      label: "Tình trạng.",
       options: {
+        display: "excluded",
         filter: true,
         sort: false,
       },
@@ -129,7 +136,15 @@ export default function AllBill(props) {
         sort: false,
       },
     },
-
+    {
+      name: "is_pay_value",
+      label: "Tình trạng",
+      options: {
+        //display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
     {
       name: "",
       options: {
@@ -155,7 +170,7 @@ export default function AllBill(props) {
           {  !tableMeta.rowData[9]?
           <Tooltip
           id="tooltip-top"
-          title="Chấp nhận"
+          title="Thanh toán"
           placement="top"
           classes={{ tooltip: classes.tooltip }}
         >
@@ -170,7 +185,7 @@ export default function AllBill(props) {
           </Fab>
         </Tooltip>: <Tooltip
                 id="tooltip-top-start"
-                title="Không chấp nhận"
+                title="Hủy thanh toán"
                 placement="top"
                 classes={{ tooltip: classes.tooltip }}
               >
@@ -204,6 +219,7 @@ export default function AllBill(props) {
     //history.push(`/userdetails/${id}`);
   };
   const handleSubmit= async()=>{
+    handleOpenLoading()
     console.log("submit");
     handleClose();
     try {
@@ -231,9 +247,15 @@ export default function AllBill(props) {
         //const result = await res.json();
         console.log("ok");
         setReload2(!reload2);
-      } else console.log("SOMETHING WENT WRONG");
-    } catch (err) {
+        handleOpenSnackBar(true)
+        handleCloseLoading()
+      } else{ console.log("SOMETHING WENT WRONG")
+      handleOpenSnackBar(false)
+      handleCloseLoading()};
+    }catch (err) {
       console.log(err);
+      handleOpenSnackBar(false)
+      handleCloseLoading()
     }
   }
   const handleClickOpen = () => {
@@ -243,9 +265,28 @@ export default function AllBill(props) {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
 
   useEffect(() => {
+    handleOpenLoading()
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK +
           `/api/all-bill/all/${selectMonth}/${selectYear}`,
@@ -275,31 +316,41 @@ export default function AllBill(props) {
         const result = await res.json();
         const result1 = await res1.json();
         console.log(result);
-       setData(await handleData(result.data, result1.data));
+        setData(await handleData(result.data, result1.data));
         setStatis(calTotal(result.data));
+        handleCloseLoading()
       } else {
         const result = await res.json();
         alert(result.message);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+      }}
+      catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     };
     getRes();
   }, [reLoad,reload2]);
   return (
+    <div>
+      <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
     <GridContainer>
       <GridContainer xs={12} sm={12} md={12}>
         <GridItem xs={12} sm={12} md={3}>
-          <div>Thông kê toàn dữ liệu</div>
+          <h3 style={{marginLeft:"30px"}}>Thông kê tháng</h3>
         </GridItem>
         <GridItem xs={12} sm={12} md={3}>
-          <div>Tổng tiền : {statis.total}</div>
+          <h3>Tổng tiền : {<NumberFormat value={statis.total} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />}</h3>
         </GridItem>
         <GridItem xs={12} sm={12} md={3}>
-          <div style={{ color: "green" }}>Tiền đã thu : {statis.total_pay}</div>
+          <h3 style={{ color: "green" }}>Tiền đã thu : {<NumberFormat value={statis.total_pay} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />}</h3>
         </GridItem>
         <GridItem xs={12} sm={12} md={3}>
-          <div style={{ color: "red" }}>
-            Tiền còn lại: {statis.total_not_pay}
-          </div>
+          <h3 style={{ color: "red" }}>
+            Tiền còn lại: {<NumberFormat value={statis.total_not_pay} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />}
+          </h3>
         </GridItem>
       </GridContainer>
 
@@ -335,5 +386,8 @@ export default function AllBill(props) {
         </DialogActions>
       </Dialog>
     </GridContainer>
+    </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
+    </div>
   );
 }

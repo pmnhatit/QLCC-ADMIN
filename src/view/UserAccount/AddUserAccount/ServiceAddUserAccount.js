@@ -25,3 +25,15 @@ export const statusList=[
   {id:2, name:"Đã thuê"},
   {id:3, name:"Đã bán"}
 ]
+export const handleApart=(apartList)=>
+{   let apart_id=[]
+    let block_id=[]
+    for(let i=0;i<apartList.length;i++)
+    {
+        apart_id[i]=apartList[i]._id;
+        block_id[i]=apartList[i].block;
+    }
+    // console.log(apart_id);
+    // console.log(block_id);
+    return{apart_id,block_id}
+}

@@ -1,3 +1,4 @@
+
 export const handleData = (data, token_device) => {
    
     // let date = new Date(data.create_date);
@@ -6,6 +7,7 @@ export const handleData = (data, token_device) => {
     // data["next_status"] =  data.status+1;
     // data["next_status_value"] =  returnStatus(data.status+1);
     data["token_device"]=token_device;
+    //data["electric_bill"]=<NumberFormat value={data.electric_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />
     // data["apart_name"]=apart.name;
      console.log(data);
      return data;

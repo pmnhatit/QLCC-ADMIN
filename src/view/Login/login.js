@@ -79,14 +79,44 @@ export default function Login() {
   };
 
   
-  const changeToken_device=async()=>
+  const changeToken_device=async(user_id,token)=>
   {
     
     messaging.requestPermission().then(()=>{
       return messaging.getToken();
     }).then(token_device=>{
-      console.log( token_device)
+      console.log(user_id,token_device)
+      apiChangeToken(user_id,token_device,token)
     })
+  }
+  const apiChangeToken=async(user_id,token_device,token)=>
+  {
+    try {
+      const body = {
+        user_id: user_id,
+        token_device: token_device,
+      };
+      console.log(body);
+      const res = await fetch(
+        process.env.REACT_APP_API_LINK + `/api/auth/update-token-device-web`,
+        {
+          method: "PUT",
+          mode: "cors",
+          headers: {
+            Authorization: "Bearer " + `${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+        console.log(res);
+        if (res.status === 200) {
+          const result = await res.json();
+          console.log(result.data);
+         } else console.log("SOMETHING WENT WRONG");
+      } catch (err) {
+        console.log(err);
+      }
   }
   const sendUser = async () => {
     try {
@@ -119,13 +149,13 @@ export default function Login() {
           setOpen(true);
           // push to redux
           //console.log("success");
-          //console.log(result.token);
-      
+          console.log(result.infoUser._id);
+          
           const action = addUser(result.infoUser,result.token);
           dispatch(action);
-          changeToken_device();
+          await changeToken_device(result.infoUser._id,result.token);
 
-          //history.push("/admin");
+          history.push("/admin/apart");
         } else if (res.status === 401) {
           setContent("Tên đăng nhập hoặc mật khẩu sai");
           setOpen(true);
@@ -169,10 +199,10 @@ export default function Login() {
             autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <FormControlLabel
+          {/* <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
-          />
+          /> */}
           <Button
             fullWidth
             variant="contained"
@@ -182,7 +212,7 @@ export default function Login() {
           >
             Sign In
           </Button>
-          <Grid container>
+          {/* <Grid container>
             <Grid item xs>
               <Link href="#" variant="body2">
                 Forgot password?
@@ -193,7 +223,7 @@ export default function Login() {
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>
-          </Grid>
+          </Grid> */}
         </form>
       </div>
       <Snackbar

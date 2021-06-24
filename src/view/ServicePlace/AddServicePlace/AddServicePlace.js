@@ -10,7 +10,8 @@ import GridContainer from "../../../component/Grid/GridContainer.js";
 import Button from "../../../component/CustomButtons/Button.js";
 //import { directionList, typeList } from "./ServiceAddApart.js";
 import TextField from "@material-ui/core/TextField";
-
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
 
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
@@ -67,24 +68,33 @@ export default function AddServicePlace() {
   const [review,setReview]=useState([{src:""}]);
   const [isSelectFile,setIsSelectFile]=useState(false);
   const [isLoad,setIsLoad]=useState(true);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false);
 
   const checkApartName = (name) => {
+    setName(name);
     if (name !== "" ) {
       setAlertName(false);
-      setName(name);
-    } else setAlertName(true);
+      return true
+    } else {setAlertName(true)
+       return false};
   };
-  const checkBlock = (block) => {
+  const checkBlock = (block) => {  
+    setBlock(block);
     if (block !== "") {
       setAlertBlock(false);
-      setBlock(block);
-    } else setAlertBlock(true);
+      return true
+    } else {setAlertBlock(true)
+    return false};
   };
   const checkDescription = (address) => {
+    setDescription(address);
     if (address !== "") {
       setAlertDescription(false);
-      setDescription(address);
-    } else setAlertDescription(true);
+      return true
+    } else {setAlertDescription(true)
+      return false};
   };
 
   const handeFile = async (file,imageUrl) => {
@@ -120,6 +130,7 @@ export default function AddServicePlace() {
     }
   };
   const handleSubmit = () => {
+    handleOpenLoading()
     getlink();
   };
 
@@ -158,7 +169,8 @@ export default function AddServicePlace() {
     }
     else
     {
-        
+      handleOpenSnackBar(false)
+      handleCloseLoading()
     }
   };
   const upload = async (url,key) => {
@@ -187,7 +199,7 @@ export default function AddServicePlace() {
     }
   };
   const AddServicePlace = async (key) => {
-    if (true) {
+    if (checkApartName(name) && checkBlock(block)&& checkDescription(description)) {
       const body = {
         name: name,
         block_id: block,
@@ -214,17 +226,41 @@ export default function AddServicePlace() {
 
           console.log("add place");
           console.log(result);
-        } else if (res.status === 500) {
-        } else console.log("SOMETHING WENT WRONG");
+          handleOpenSnackBar(true)
+          handleCloseLoading()
+        } else {console.log("SOMETHING WENT WRONG")
+        handleOpenSnackBar(false)
+        handleCloseLoading()};
       } catch (err) {
         console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     } else {
+      handleOpenSnackBar(false)
+      handleCloseLoading()
     }
+  };const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
   };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
   useEffect(() => {
     setIsLoad(true);
     const getRes = async () => {
+      try{
       const res1 = await fetch(
         process.env.REACT_APP_API_LINK + `/api/block/all`,
         {
@@ -247,14 +283,19 @@ export default function AddServicePlace() {
         // setData(await handleData(result.data, result1.data));
       } else {
         const result = await res1.json();
-        alert(result.message);
+        console.log(result.message);
+        handleOpenSnackBar(false)
+      }} catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
+        
       }
     };
     getRes();
   }, []);
 
   return (
-    <div>
+    <div> <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       <GridContainer>
         {!isLoad &&<GridItem xs={12} sm={12} md={12}>
           <GridContainer>
@@ -356,6 +397,8 @@ export default function AddServicePlace() {
           </GridItem>
         </GridItem>}
       </GridContainer>
+     </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

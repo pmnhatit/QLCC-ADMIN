@@ -19,7 +19,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useParams, useHistory } from "react-router-dom";
-import {handleData,title,content} from "../ServiceDetail.js"
+import {handleData,title,content} from "./ServiceDetailRequestSelfRepair.js"
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
 
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
@@ -47,6 +49,10 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
     width: "25ch",
   },
+  myButton:{
+    float: "right",
+    width:"200px"
+ }
 }));
 export default function DetailRequestSelfRepair(props) {
   //const dispatch = useDispatch();
@@ -69,17 +75,19 @@ export default function DetailRequestSelfRepair(props) {
   const [image, setImage] = useState();
   const [isLoad, setIsLoad] = useState(true);
   const [open, setOpen] = useState(false);
+  const [open1, setOpen1] = useState(false);
   const [reload,setReload]=useState(false);
-  const [selected, setSelected] = useState(true); // true:chấp nhận|| false:không chấp nhận
-  //   const token = useSelector((state) => state.user.token);
-
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false);
   
-  const handleChangeStatus = async () => {
+  const handleChangeStatus = async (next_status) => {
     try {   
       handleClose();
+      handleClose1();
       const body = {
         notice_id: data._id,
-        status: data.next_status
+        status: next_status
     };
     
       console.log(body);
@@ -168,7 +176,7 @@ export default function DetailRequestSelfRepair(props) {
           // setIsLoad(false);
         } else {
           const result = await res.json();
-          alert(result.message);
+          console.log(result.message);
         }
       } catch (err) {
         console.log(err);
@@ -177,12 +185,18 @@ export default function DetailRequestSelfRepair(props) {
     setIsLoad(false);
   };
   const handleClickOpen = (temp) => {
-    setSelected(temp);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
+  };
+  const handleClickOpen1 = (temp) => {
+    setOpen1(true);
+  };
+
+  const handleClose1 = () => {
+    setOpen1(false);
   };
   const renderButton = () => {
     console.log(data.status);
@@ -196,24 +210,41 @@ export default function DetailRequestSelfRepair(props) {
           >
             {data.next_status_value}
           </Button>
-          {/* <Button
+          <Button
             className={classes.myButton}
             color="primary"
             onClick={(e) => handleClickOpen1(true)}
           >
             Không duyệt
-          </Button> */}
+          </Button>
         </div>
       );
-    } else if (data.status === 2||data.status === 3) {
+    } else if (data.status === 1||data.status === 3) {
       return <div></div>;
     } else {
       return (
-        <Button color="primary" onClick={(e) => handleClickOpen(true)}>
+        <Button className={classes.myButton} color="primary" onClick={(e) => handleClickOpen(true)}>
           {data.next_status_value}
         </Button>
       );
     }
+  }
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
   }
   const getUserAndApart = async (data)=>
   { 
@@ -249,7 +280,7 @@ export default function DetailRequestSelfRepair(props) {
       setIsLoad(false);
     } else {
       const result = await res.json();
-      alert(result.message);
+      console.log(result.message);
     }
 
   }
@@ -278,7 +309,7 @@ export default function DetailRequestSelfRepair(props) {
       
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message);
       }
     };
     getRes();
@@ -286,13 +317,14 @@ export default function DetailRequestSelfRepair(props) {
 
   return (
     <div>
+      <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       {!isLoad ? (
         <GridContainer>
           <GridItem xs={12} sm={12} md={5}>
             <Card profile>
               <CardAvatar>
                 <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                  <img src={image} alt="không có ảnh" width="400" height="auto" />
+                  <img src={image} alt="không có ảnh" width="400" height="400" />
                 </a>
               </CardAvatar>
             </Card>
@@ -390,15 +422,8 @@ export default function DetailRequestSelfRepair(props) {
           </GridItem>
           <div />
           <GridItem xs={12} sm={12} md={3} />
-          <GridItem xs={12} sm={12} md={6}>
-            {/* {isHandle && (
-            <div style={{ marginTop: "15px" }}>Đang xử lý, vui lòng chờ...</div>
-          )}*/}
-            {isError && (
-              <div style={{ marginTop: "15px" }}>Vui lòng thử lại</div>
-            )}
-          </GridItem>
-          <GridItem xs={12} sm={12} md={3}>          
+          
+          <GridItem xs={12} sm={12} md={9}>          
                {renderButton()}
           </GridItem>
         </GridContainer>
@@ -424,11 +449,36 @@ export default function DetailRequestSelfRepair(props) {
           <Button onClick={handleClose} color="primary">
             Hủy
           </Button>
-          <Button onClick={handleChangeStatus} color="primary">
+          <Button onClick={e=>handleChangeStatus(data.next_status)} color="primary">
             Xác nhận
           </Button>
         </DialogActions>
       </Dialog>
+      <Dialog
+        open={open1}
+        onClose={handleClose1}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">
+          Xác nhận chuyển trạng thái
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Chuyển từ {data.status_value} thành Không duyệt
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose1} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={(e) => handleChangeStatus(3)} color="primary">
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

@@ -18,21 +18,23 @@ export const year=[
 ]
 export const createTimeChoice=()=>
 {
-    const month = [];
+    const month = [{id:0,name:"Chọn tháng"}];
     const year = [];
     const selectYear=parseInt(process.env.REACT_APP_YEAR_START);
     const date= new Date();
-    console.log(date.getMonth() +"-" +date.getFullYear());
-    for(let i=0; i<date.getMonth();i++)
+  
+    for(let i=1; i<13;i++)
     {
         month[i]=
         
-            {name:i+1}
+            {id:i,
+            name:i}
         
     }
-    for(let i=0;i<date.getFullYear()-selectYear;i++)
+    for(let i=0;i<date.getFullYear()-selectYear+1;i++)
     {
         year[i]={id:i+selectYear}
     }
-    return year;
+
+    return {month,year}
 }

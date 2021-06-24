@@ -25,9 +25,10 @@ import AddAlertIcon from '@material-ui/icons/AddAlert';
 import BuildIcon from '@material-ui/icons/Build';
 import DriveEtaIcon from '@material-ui/icons/DriveEta';
 import HomeWorkIcon from '@material-ui/icons/HomeWork';
+import DescriptionIcon from '@material-ui/icons/Description';
 import MarkunreadMailboxIcon from '@material-ui/icons/MarkunreadMailbox';
 import AddCommentIcon from '@material-ui/icons/AddComment';
-
+import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 // core components/views for Admin layout
 //import Homepage from "./view/Homepage/homepage";
 import UserProfile from "./view/Profile/profile";
@@ -98,6 +99,15 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
+    path: "/notification/detail/:id",
+    name: "Thông báo chung",
+    rtlName: "لوحة القيادة",
+    icon: AddAlertIcon,
+    component: SendNotification,
+    layout: "/admin",
+    private:true
+  },
+  {
     path: "/notification",
     name: "Thông báo chung",
     rtlName: "لوحة القيادة",
@@ -145,18 +155,19 @@ const dashboardRoutes = [
     path: "/reportbill",
     name: "Khiếu nại hóa đơn",
     rtlName: "ملف تعريفي للمستخدم",
-    icon: ReceiptIcon,
+    icon: DescriptionIcon,
     component:ReportBill ,
     layout: "/admin",
   },
-  // {
-  //   path: "/profile",
-  //   name: "Thông tin tài khoản",
-  //   rtlName: "ملف تعريفي للمستخدم",
-  //   icon: Person,
-  //   component:UserProfile,
-  //   layout: "/admin"
-  // },
+  {
+    path: "/profile",
+    name: "Thông tin tài khoản",
+    rtlName: "ملف تعريفي للمستخدم",
+    icon: Person,
+    component:UserProfile,
+    layout: "/admin",
+    private: true
+  },
   {
     path: "/user_account/:id",
     name: "Chi tiet người dùng",
@@ -174,14 +185,15 @@ const dashboardRoutes = [
     component:UserAccount ,
     layout: "/admin"
   },
-  // {
-  //   path: "/admin_account",
-  //   name: "Quản lý admin",
-  //   rtlName: "ملف تعريفي للمستخدم",
-  //   icon: Person,
-  //   component:AdminAccount ,
-  //   layout: "/admin"
-  // },
+
+  {
+    path: "/admin_account",
+    name: "Quản lý admin",
+    rtlName: "ملف تعريفي للمستخدم",
+    icon: SupervisorAccountIcon,
+    component:AdminAccount ,
+    layout: "/admin"
+  },
   {
     path: "/repair/repair/detail/:notice_id",
     name: "Sửa chữa dịch vụ",

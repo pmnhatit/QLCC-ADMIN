@@ -6,10 +6,10 @@ import {messaging} from "../../firebase"
 
 export default function Main()
 {   
-  messaging.onMessage(async (payload) => {
-    console.log('Message received. ', payload);
-    // ...
-  });
+  // messaging.onMessage(async (payload) => {
+  //   console.log('Message received. ', payload);
+  //   // ...
+  // });
   console.log("main");
     const LoginContainer = () => (
         <div className="container">
@@ -33,9 +33,11 @@ export default function Main()
         <BrowserRouter>
       
         <div className="main-route-place">
-            <Switch>        
-                <Route exact path="/login" component={LoginContainer}/>
-                <Route component={DefaultContainer}/>
+            <Switch>
+                 <Route  exact path="/" component={Login} /> 
+                {/* <Route path="/" component={LoginContainer}/> */}
+                <Route component={DefaultContainer}/>  
+                    
             </Switch>
         </div>
         

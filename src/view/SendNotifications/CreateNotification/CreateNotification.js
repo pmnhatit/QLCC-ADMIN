@@ -16,7 +16,9 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-
+import LoadingOverlay from "react-loading-overlay";
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import FloorNotification from "./Floor/FloorNotifications.js"
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -55,8 +57,12 @@ export default function CreateNotification() {
   const [contentList, setContentList] = useState([]);
   const nameCheck = /^[a-zA-Z0-9]+$/;
   const phoneCheck = /^[0-9]+$/;
+
   const token = useSelector((state) => state.user.token);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); 
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+  const [isHandle,setIsHandle]=useState(false);
   const [alertTitle, setAlertTitle] = useState(false);
   const [alertContent, setAlertContent] = useState(false);
   const [alertLink, setAlertLink] = useState(false);
@@ -67,7 +73,8 @@ export default function CreateNotification() {
   const [type, setType] = useState("all");
   const [image, setImage] = useState("");
   const [block, setBlock] = useState();
-
+  const [floor,setFloor]=useState();
+  const [apart_id,setApart_id]=useState();
   const [nameFile, setNameFile] = useState([]);
   const [fileExtension, setFileExtenstion] = useState([]);
   const [fileMediaType, setFileMediaType] = useState([]);
@@ -75,32 +82,31 @@ export default function CreateNotification() {
   const [review, setReview] = useState([{ src: "" }]);
   const [isSelectFile, setIsSelectFile] = useState(false);
   const [reload, setReload] = useState(false);
-  const [isHandle, setIsHandle] = useState(false);
 
-  const checkTitle = (name) => {
+  const checkTitle = (name) => { 
+    setTitle(name);
     if (name !== "") {
       setAlertTitle(false);
-      setTitle(name);
       return true;
     } else {
       setAlertTitle(true);
       return false;
     }
   };
-  const checkContent = (content) => {
+  const checkContent = (content) => {  
+    setContent(content);
     if (content !== "") {
       setAlertContent(false);
-      setContent(content);
       return true;
     } else {
       setAlertContent(true);
       return false;
     }
   };
-  const checkLink = (link) => {
+  const checkLink = (link) => {  
+    setLink(link);
     if (true) {
       setAlertLink(false);
-      setLink(link);
     } else setAlertLink(true);
   };
 
@@ -116,7 +122,11 @@ export default function CreateNotification() {
       return ;
     }
     if (type === "block") {
-      return <BlockNotification setBlock={setBlock}></BlockNotification>;
+      return <BlockNotification setBlock={setBlock} handleOpenLoading={handleOpenLoading}handleCloseLoading={handleCloseLoading} handleOpenSnackBar={handleOpenSnackBar}></BlockNotification>;
+    }
+    if (type==="floor")
+    {
+      return <FloorNotification setBlock={setBlock} setFloor={setFloor} setApart_id={setApart_id} handleOpenLoading={handleOpenLoading}handleCloseLoading={handleCloseLoading} handleOpenSnackBar={handleOpenSnackBar}/>
     }
   };
   const handeFile = async (file, imageUrl) => {
@@ -153,6 +163,7 @@ export default function CreateNotification() {
   const handleSubmit = () => {
     //getlink();
     handleClose();
+    handleOpenLoading()
     getlink();
   };
 
@@ -180,16 +191,21 @@ export default function CreateNotification() {
             console.log("image ok" + i);
             url.push(result.uploadUrl);
             key.push(result.key);
-          } else if (res.status === 500) {
-          } else console.log("SOMETHING WENT WRONG");
+          }  else {
+            console.log("SOMETHING WENT WRONG");
+          handleCloseLoading()
+          handleOpenSnackBar(false)}
         }
         console.log(key);
         upload(url, key);
       } catch (err) {
         console.log(err);
+        handleCloseLoading()
+        handleOpenSnackBar(false)
       }
     } else {
-      createBody("");
+      console.log("no image");
+      createBody([""]);
     }
   };
   const upload = async (url, key) => {
@@ -209,13 +225,16 @@ export default function CreateNotification() {
           console.log("upload ok" + i);
         } else {
           console.log("SOMETHING WENT WRONG");
-          //setIsError(true);
+          handleCloseLoading()
+          handleOpenSnackBar(false)
         }
       }
       //console.log(key);
       createBody(key);
     } catch (err) {
       console.log(err);
+      handleCloseLoading()
+      handleOpenSnackBar(false)
     }
   };
   const createBody = async (key) => {
@@ -244,6 +263,23 @@ export default function CreateNotification() {
           image: key[0],
           block_id: block,
         };
+        
+        console.log(body);
+        sendNotification(body);
+      }
+      if (type === "floor") {
+        //console.log("block true");
+        const body = {
+          title: title,
+          content: content,
+          link: link,
+          type: type,
+          image: key[0],
+          block_id: block,
+          floor: floor,
+          apart_id:apart_id
+        };
+        
         console.log(body);
         sendNotification(body);
       }
@@ -269,11 +305,17 @@ export default function CreateNotification() {
 
         console.log("send notification");
         console.log(result.tokens_device);
-       PushNotification(result.tokens_device)
-      } else if (res.status === 500) {
-      } else console.log("SOMETHING WENT WRONG");
+       await PushNotification(result.tokens_device)
+       handleCloseLoading()
+       handleOpenSnackBar(true);
+      } else {
+        console.log("SOMETHING WENT WRONG")
+        handleCloseLoading()
+        handleOpenSnackBar(false)};
     } catch (err) {
       console.log(err);
+      handleCloseLoading()
+      handleOpenSnackBar(false)
     }
   };
 
@@ -312,19 +354,33 @@ export default function CreateNotification() {
         console.log(err);
       }
   }
-  const handleClick = async (row) => {
-    handleClickOpen();
-  };
-
+ 
   const handleClickOpen = (temp) => {
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
   };
+  const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
 
   return (
-    <div>
+    <div> <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <GridContainer>
@@ -359,6 +415,7 @@ export default function CreateNotification() {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                multiline={true}
                 variant="outlined"
                 onChange={(e) => checkContent(e.target.value)}
               />
@@ -401,7 +458,7 @@ export default function CreateNotification() {
                 style={{ marginTop: "15px" }}
                 type="file"
                 onChange={(e) => handeFile(e.target.files, e.target.value)}
-               // multiple
+                multiple
                 accept="image/*"
               />
             </GridItem>
@@ -412,7 +469,7 @@ export default function CreateNotification() {
                     <img
                       src={option.src}
                       alt="Girl in a jacket"
-                      style={{ width: "50px", height: "50px" }}
+                      style={{ width: "100px", height: "100px" }}
                     ></img>
                   ))}
                 {/* {<img src={review[0].src} alt="Girl in a jacket" style={{width:"30px",height:"30px"}}></img>} */}
@@ -444,9 +501,15 @@ export default function CreateNotification() {
             <GridItem xs={12} sm={12} md={9}>
               {renderTo()}
             </GridItem>
+            <GridItem xs={12} sm={12} md={9}>
+            {alertLink && (
+                <Alert severity="error" className={classes.alerts}>
+                 Không hợp lệ
+                </Alert>
+              )}
+            </GridItem>
           </GridContainer>
           <GridItem xs={12} sm={12} md={3}>
-            {isHandle && <div>Đang xử lý ...</div>}
           </GridItem>
           <GridItem xs={12} sm={12} md={9}>
             <Button
@@ -481,6 +544,8 @@ export default function CreateNotification() {
           </DialogActions>
         </Dialog>
       </GridContainer>
+     </LoadingOverlay>
+      <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

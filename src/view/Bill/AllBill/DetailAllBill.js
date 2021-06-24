@@ -1,27 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-//import InputLabel from "@material-ui/core/InputLabel";
-// core components
-import GridItem from "../../../component/Grid/GridItem.js";
-import GridContainer from "../../../component/Grid/GridContainer.js";
-import CardHeader from "../../../component/Card/CardHeader.js";
-import Button from "../../../component/CustomButtons/Button.js";
-// import Card from "../../../component/Card/Card.js";
-// import CardAvatar from "../../../component/Card/CardAvatar.js";
-// import CardBody from "../../../component/Card/CardBody.js";
-import TextField from "@material-ui/core/TextField";
 // import avatar from "../../../asset/img/faces/marc.jpg";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import {handleData,title,content} from "./ServiceDetailAllBill.js"
-
+// @material-ui/core components
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import React, { useEffect, useState } from "react";
+import LoadingOverlay from "react-loading-overlay";
+import NumberFormat from 'react-number-format';
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { Fastfood } from "@material-ui/icons";
+import CardHeader from "../../../component/Card/CardHeader.js";
+import Button from "../../../component/CustomButtons/Button.js";
+import GridContainer from "../../../component/Grid/GridContainer.js";
+// core components
+import GridItem from "../../../component/Grid/GridItem.js";
+import Snackbar from "../../../component/SnackBar/Snackbar.js";
+import { content, handleData, title } from "./ServiceDetailAllBill.js";
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -49,7 +46,8 @@ const useStyles = makeStyles((theme) => ({
     width: "25ch",
   },
   myButton:{
-     float: "right"
+     float: "right",
+     width:"200px"
   }
 }));
 export default function DetailAllBill(props) {
@@ -70,22 +68,25 @@ export default function DetailAllBill(props) {
   });
   const [isLoad, setIsLoad] = useState(true);
   const [open, setOpen] = useState(false);
+  const [open1, setOpen1] = useState(false);
+  const [open2, setOpen2] = useState(false);
   const [reload, setReload] = useState(true);
   const [isLate, setIsLate] = useState(false);
   const [isDenied, setIsDenied] = useState(false);
   const [isHandle,setIsHandle]=useState(false);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+   const [snackType,setSnackType]=useState(true);
   const checkTime = (data) => {
     if (isLastMonth(data) && currentDate >= process.env.REACT_APP_TIME_LATE) {
       setIsLate(true);
-      console.log("1 true");
     }
     if (isLastMonth(data) && currentDate >= process.env.REACT_APP_TIME_DENIED) {
       setIsDenied(true);
-      console.log("2 true");
     }
   };
   const isLastMonth=(data)=>
   { 
+    if(parseInt(currentMonth)===parseInt(data.month) &&parseInt(currentYear)===parseInt(data.year))
     return true;
   }
   const handleSubmit = async () => {
@@ -119,7 +120,7 @@ export default function DetailAllBill(props) {
     }
   };
   const handleNoti1 = async() => {
-      setIsHandle(true);
+      handleOpenLoading()
       const body = {
         apart_id: data.apart_id,
         apart_name: data.apart_name,
@@ -134,7 +135,7 @@ export default function DetailAllBill(props) {
 
   };
   const handleNoti2 = () => {
-    setIsHandle(true);
+    handleOpenLoading()
   const body = {
         apart_id: data.apart_id,
         apart_name: data.apart_name,
@@ -164,10 +165,15 @@ export default function DetailAllBill(props) {
         //const result = await res.json();
         console.log("noti ok");
         await PushNotification();
-        setIsHandle(false);
-      } else console.log("SOMETHING WENT WRONG");
+        handleOpenSnackBar(true)
+        handleCloseLoading()
+      } else {console.log("SOMETHING WENT WRONG");
+      handleOpenSnackBar(false)
+      handleCloseLoading()}
     } catch (err) {
       console.log(err);
+      handleOpenSnackBar(false)
+      handleCloseLoading()
     }
   
   };
@@ -211,6 +217,37 @@ export default function DetailAllBill(props) {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleClickOpen1 = () => {
+    setOpen1(true);
+  };
+
+  const handleClose1 = () => {
+    setOpen1(false);
+  };
+  const handleClickOpen2 = () => {
+    setOpen2(true);
+  };
+
+  const handleClose2 = () => {
+    setOpen2(false);
+  };
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
   const getToken_device =async(data,apart_id)=>
   {
     try {
@@ -230,17 +267,21 @@ export default function DetailAllBill(props) {
         const result = await res.json();
         
         console.log("get token device ok");
-        setData(handleData(data,result.token_device));
-        //history.push(`/admin/reportbill`);
+        setData(await handleData(data,result.token_device));
       } else {
         console.log("SOMETHING WENT WRONG");
+        handleOpenSnackBar(false)
       }
     } catch (err) {
       console.log(err);
+      handleOpenSnackBar(false)
     }
   }
+  
+  
   useEffect(() => {
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/all-bill/${bill_id}`,
         {
@@ -264,13 +305,20 @@ export default function DetailAllBill(props) {
         setIsLoad(false);
       } else {
         const result = await res.json();
-        alert(result.message);
+        console.log(result.message);
+        handleOpenSnackBar(false)
       }
+    }catch (err) {
+      console.log(err);
+      handleOpenSnackBar(false)
+     
+    }
     };
     getRes();
   }, [reload]);
   return (
     <div>
+      <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       {!isLoad ? (
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
@@ -279,6 +327,7 @@ export default function DetailAllBill(props) {
             </CardHeader>
             <GridContainer>
               <GridItem xs={12} sm={12} md={12}>
+              
                 <TextField
                   id="apart_name"
                   label="Tên Phòng"
@@ -309,7 +358,7 @@ export default function DetailAllBill(props) {
                   defaultValue={data.month + "/" + data.year}
                 />
 
-                <TextField
+                <NumberFormat value={data.electric_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => <TextField
                   id="elec"
                   label="Hóa đơn điện"
                   fullWidth
@@ -321,9 +370,9 @@ export default function DetailAllBill(props) {
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.electric_bill}
-                />
-                <TextField
+                  defaultValue={value}
+                />} />
+                <NumberFormat value={data.water_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) =>  <TextField
                   id="water"
                   label="Hóa đơn nước"
                   fullWidth
@@ -335,9 +384,9 @@ export default function DetailAllBill(props) {
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.water_bill}
-                />
-                <TextField
+                  defaultValue={value}
+                />} />
+               <NumberFormat value={data.other_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) =>  <TextField
                   id="other"
                   label="Hóa đơn khác"
                   //style={{ margin: 8 }}
@@ -350,9 +399,10 @@ export default function DetailAllBill(props) {
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.other_bill}
-                />
-                <TextField
+                  defaultValue={value}
+                />} />
+               <NumberFormat value={data.total_money} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) =>  
+               <TextField
                   id="total"
                   label="Tổng tiền"
                   //style={{ margin: 8 }}
@@ -365,9 +415,10 @@ export default function DetailAllBill(props) {
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.total_money}
+                  defaultValue={value}
                   //onChange={(e) => setName(e.target.value)}
-                />
+                />} />
+               
                 <TextField
                   id="is_pay"
                   label="Tình trạng"
@@ -393,11 +444,7 @@ export default function DetailAllBill(props) {
 
           
           <GridItem xs={12} sm={12} md={4}>
-           {isHandle && (
-            <div style={{ marginTop: "15px" }}>Đang xử lý, vui lòng chờ...</div>
-          )}  
-          {/*
-          {isError && <div style={{ marginTop: "15px" }}>Vui lòng thử lại</div>} */}
+           
           </GridItem>
           {data.is_pay ? (
              <GridItem xs={12} sm={12} md={8}  >
@@ -411,12 +458,12 @@ export default function DetailAllBill(props) {
                 Thanh toán
               </Button>
             {isLate &&
-              <Button className={classes.myButton} color="primary" onClick={(e) => handleNoti1()}>
+              <Button className={classes.myButton} color="primary" onClick={(e) => handleClickOpen1()}>
                 Thông báo trễ hạn
               </Button>
             }
             {isDenied &&(
-              <Button  className={classes.myButton} color="primary" onClick={(e) => handleNoti2()}>
+              <Button  className={classes.myButton} color="primary" onClick={(e) => handleClickOpen2()}>
                 Thông báo cắt điện nước
               </Button>
             )}
@@ -441,8 +488,8 @@ export default function DetailAllBill(props) {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Căn hộ: {data.apart_name}
-            Tổng tiền: {data.total_money}
+            <div>Căn hộ: {data.apart_name}</div>
+            <div>Tổng tiền: {data.total_money}</div>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -454,6 +501,56 @@ export default function DetailAllBill(props) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog
+        open={open1}
+        onClose={handleClose1}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">
+            Xác nhận thông báo trễ hạn
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Căn hộ: {data.apart_name}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose1} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={(e) => handleNoti1()} color="primary">
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={open2}
+        onClose={handleClose2}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">
+          Xác nhận thông báo cắt điện
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Căn hộ: {data.apart_name}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose2} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={(e) => handleNoti2()} color="primary">
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

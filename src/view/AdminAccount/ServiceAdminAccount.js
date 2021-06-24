@@ -15,6 +15,6 @@ export const handleData=(user)=>{
             phone: user[i].phone,
         }} 
     }
-    console.log(newUser);
+   //console.log(newUser);
     return newUser;
 }

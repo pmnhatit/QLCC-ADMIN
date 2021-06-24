@@ -5,7 +5,18 @@ import { makeStyles } from "@material-ui/core/styles";
 import Button from "../../../component/CustomButtons/Button.js"
 import { useHistory } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
+import EditIcon from '@material-ui/icons/Edit';
+import Close from "@material-ui/icons/Close";
 
+import Tooltip from "@material-ui/core/Tooltip";
+import Fab from '@material-ui/core/Fab';
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1),
@@ -17,7 +28,14 @@ export default function UserAccount() {
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
+  
+  const [reload,setReload]=useState();
+ const [openSnackBar,setOpenSnackBar]=useState(false);
+ const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false);
+const [open, setOpen] = useState(false);
 
+const [id,setID]=useState("");
   const options = {
     filterType: "dropdown",
     responsive: "scroll",
@@ -70,22 +88,39 @@ export default function UserAccount() {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <div>
-            <Button
-              //className={classes.button}
-              //variant="outlined"
-              color="primary"
-              onClick={() => handleClick(tableMeta.rowData[0])}>
-              Chi tiết
-            </Button>
-
-             <Button
-              className={classes.button}
-             //variant="outlined"
-             color="danger"
-             onClick={() => handleClick(tableMeta.rowData[0])}>
-             Xóa
-           </Button>
-           </div>
+            <Tooltip
+            id="tooltip-top"
+            title="Chi tiết"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <Fab
+              size="small"
+              color="red"
+              aria-label="add"
+              className={classes.margin}
+              onClick={() => handleClick(tableMeta.rowData[0])}
+            >
+              <EditIcon color="primary"/>
+            </Fab>
+          </Tooltip>
+         <Tooltip
+                id="tooltip-top-start"
+                title="Xóa"
+                placement="top"
+                classes={{ tooltip: classes.tooltip }}
+              >
+                <Fab
+                  size="small"
+                  color="secondary"
+                  aria-label="add"
+                  className={classes.margin}
+                  onClick={() => {setID(tableMeta.rowData[0]); handleClickOpen()}}
+                >
+                  <Close />
+                </Fab>
+          </Tooltip>
+          </div>
           );
         },
       },
@@ -94,9 +129,68 @@ export default function UserAccount() {
   const handleClick = (id) => {
     history.push(`/admin/user_account/${id}`);
   };
-
+  const handleDelete=async()=>{
+    console.log(id);
+    handleOpenLoading()
+    console.log("submit");
+    handleClose();
+    try {
+  
+      const res = await fetch(
+        process.env.REACT_APP_API_LINK +
+          `/api/user/delete/${id}`, 
+        {
+          method: "DELETE",
+          mode: "cors",
+          headers: {
+            Authorization: "Bearer " + `${token}`,
+            "Content-Type": "application/json",
+         
+          }, 
+         
+        }
+      );
+      if (res.status === 200) {
+        console.log("delete ok");
+        setReload(!reload);
+        handleOpenSnackBar(true)
+        handleCloseLoading()
+      } else{ console.log("SOMETHING WENT WRONG")
+      handleOpenSnackBar(false)
+      handleCloseLoading()};
+    }catch (err) {
+      console.log(err);
+      handleOpenSnackBar(false)
+      handleCloseLoading()
+    }
+  }
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
   useEffect(() => {
+    handleOpenLoading()
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/user/all`,
         {
@@ -112,23 +206,54 @@ export default function UserAccount() {
         console.log("Vo 200OK");
         const result = await res.json();
         setData(await handleData(result.data));
-       
+        handleCloseLoading()
+        
       } else {
         const result = await res.json();
         alert(result.message);
+        handleCloseLoading()
+        handleOpenSnackBar(false);
       }
+    } catch (err) {
+      console.log(err); 
+      handleCloseLoading()
+      handleOpenSnackBar(false);
+     
+    }
     };
     getRes();
-  }, []);
+  }, [reload]);
   return (
     <div>
-     
+      <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       <MUIDataTable
         title={"Danh sách căn hộ "}
         data={data}
         columns={columns}
         options={options}
       />
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title"> Xác nhận xóa người dùng</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={handleDelete} color="primary">
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

@@ -95,7 +95,7 @@ export default function Admin({ ...rest }) {
   return (
     <div className={classes.wrapper}>
       <Sidebar
-        routes={routes}
+        routes={ routes}
         logoText={"Creative Tim"}
         logo={logo}
         image={image}

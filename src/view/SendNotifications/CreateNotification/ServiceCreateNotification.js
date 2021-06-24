@@ -8,13 +8,14 @@ export const contentPush="Yêu cầu của anh/chị đã được xử lý"
 export const to =[
     {id:"all", value:"Tất cả"},
     {id:"block",value:"Tòa nhà"},
-    //{id:3,value:"Tầng"},
-    //{id:3,value:"1 Người"}
-    
+    {id:"floor",value:"Tầng(Thông báo có căn hộ sửa chữa)"},
+    {id:"apart",value:"1 Căn hộ"} 
 ]
  const TitleDialog=[
     {id:"all", value:"Xác nhận thông báo cho tất cả người dùng"},
     {id:"block",value:"Xác nhận thông báo cho tòa nhà"},
+    {id:"floor",value:"Xác nhận thông báo cho tầng"},
+    {id:"block",value:"Xác nhận thông báo cho căn hộ"},
     //{id:3,value:"Tầng"},
 ]
 export const returnTitleDialog=(value)=>

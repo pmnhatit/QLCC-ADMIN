@@ -9,12 +9,16 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Fab from '@material-ui/core/Fab';
 import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
 import { makeStyles } from "@material-ui/core/styles";
-
+import LoadingOverlay from "react-loading-overlay";
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
 const useStyles = makeStyles(styles);
 export default function ListBlock() {
   const classes = useStyles();
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+  const [isHandle,setIsHandle]=useState(false);
   const [data, setData] = useState([]);
 
   const options = {
@@ -28,15 +32,15 @@ export default function ListBlock() {
       label: "id",
       options: {
         display: false,
-        filter: true,
-        sort: true,
+        filter: false,
+        sort: false,
       },
     },
     {
       name: "order",
       label: "Số thứ tự",
       options: {
-        filter: true,
+        filter: false,
         sort: false,
       },
     },
@@ -90,9 +94,28 @@ export default function ListBlock() {
     console.log(id);
     history.push(`/admin/block/detail/${id}`);
   };
+  const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
+  };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+  const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
 
   useEffect(() => {
+    handleOpenLoading()
     const getRes = async () => {
+      try{
       const res1 = await fetch(
         process.env.REACT_APP_API_LINK + `/api/block/all`,
         {
@@ -110,21 +133,33 @@ export default function ListBlock() {
         const result1 = await res1.json();
         setData(handleData(result1.data));
         console.log(result1.data);
+        handleCloseLoading()
       } else {
         const result1 = await res1.json();
-        alert(result1.message);
+        //alert(result1.message);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+      }}
+      catch (err) {
+        console.log(err);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     };
     getRes();
   }, []);
   return (
     <div>
+      <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       <MUIDataTable
-        title={"Danh sách tòa nhà "}
+        title={""}
         data={data}
         columns={columns}
         options={options}
       />
+      
+       </LoadingOverlay> 
+       <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

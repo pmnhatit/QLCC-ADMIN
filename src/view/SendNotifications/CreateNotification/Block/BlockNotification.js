@@ -47,13 +47,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 export default function BlockNotification(props) {
   const token = useSelector((state) => state.user.token);
-  const {setBlock}=props;
+  const {setBlock, handleOpenLoading,handleCloseLoading,handleOpenSnackBar}=props;
   const [isLoad,setIsLoad]=useState(true);
   const [blockList,setBlockList]=useState([]);
  // console.log("block");
   useEffect(() => {
     setIsLoad(true);
     const getRes = async () => {
+      try{
       const res1 = await fetch(
         process.env.REACT_APP_API_LINK + `/api/block/all`,
         {
@@ -72,10 +73,17 @@ export default function BlockNotification(props) {
         setBlockList(result1.data);
         setBlock(result1.data[0]._id);
         setIsLoad(false);
+        handleCloseLoading()
         // setData(await handleData(result.data, result1.data));
       } else {
         const result = await res1.json();
-        alert(result.message);
+        console.log(result.message);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
+      }}catch (err) {
+        console.log(err);
+         handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     };
     getRes();
@@ -89,7 +97,6 @@ export default function BlockNotification(props) {
                 select
                 label="Tòa nhà"
                 margin="normal"
-                defaultValue={to[0]}
                 onChange={(e) => setBlock(e.target.value)}
                 SelectProps={{
                   native: true,
