@@ -40,6 +40,7 @@ const [id,setID]=useState("");
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
+    download: false,
   };
   const columns = [
     {
@@ -80,7 +81,7 @@ const [id,setID]=useState("");
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <div>
-            {/* <Tooltip
+            <Tooltip
             id="tooltip-top"
             title="Chi tiết"
             placement="top"
@@ -95,7 +96,7 @@ const [id,setID]=useState("");
             >
               <EditIcon color="primary"/>
             </Fab>
-          </Tooltip> */}
+          </Tooltip>
          <Tooltip
                 id="tooltip-top-start"
                 title="Xóa"
@@ -119,7 +120,7 @@ const [id,setID]=useState("");
     },
   ];
   const handleClick = (id) => {
-    history.push(`/notification/detail/${id}`);
+    history.push(`/admin/notification/detail/${id}`);
   };
   const handleDelete=async()=>{
     console.log(id);

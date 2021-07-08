@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";  //78
 import { useSelector } from "react-redux";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
@@ -22,6 +22,7 @@ import { useParams, useHistory } from "react-router-dom";
 import { handleData, title, content } from "./ServiceDetailBrowsePost.js";
 import Snackbar from "../../../component/SnackBar/Snackbar.js"
 import LoadingOverlay from "react-loading-overlay";
+import PushNotiAdmin from "../../PushNotiAdmin.js"
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -61,15 +62,9 @@ export default function DetailRequestSelfRepair() {
   const token = useSelector((state) => state.user.token);
   const { id } = useParams();
   const [data, setData] = useState({
-    // id: "",
-    // apart_id: "",
-    // apart_name: "",
-    // electric_bill: 0,
-    // water_bill: 0,
-    // year: 0,
-    // status_value:"",
-    // next_status_value:""
+  
   });
+  const {PushNotificationAdmin}=PushNotiAdmin()
   const [isError, setIsError] = useState(false);
   const [image, setImage] = useState([]);
   const [isLoad, setIsLoad] = useState(true);
@@ -125,6 +120,7 @@ export default function DetailRequestSelfRepair() {
         console.log("ok");
         console.log(result.data)
         await PushNotification();
+        PushNotificationAdmin()
         setReload(!reload);
         handleOpenSnackBar(true)
         handleCloseLoading()
@@ -336,6 +332,10 @@ export default function DetailRequestSelfRepair() {
                     shrink: true,
                     readOnly: true,
                   }}
+                  InputProps={{
+                              readOnly: true,
+                            }}
+                  
                   variant="outlined"
                   defaultValue={data.title || ""}
                   //onChange={(e) => setName(e.target.value)}
@@ -350,6 +350,10 @@ export default function DetailRequestSelfRepair() {
                     shrink: true,
                     readOnly: true,
                   }}
+                  InputProps={{
+                              readOnly: true,
+                            }}
+                  
                   multiline={true}
                   variant="outlined"
                   defaultValue={data.content}
@@ -365,6 +369,10 @@ export default function DetailRequestSelfRepair() {
                     shrink: true,
                     readOnly: true,
                   }}
+                  InputProps={{
+                              readOnly: true,
+                            }}
+                  
                   variant="outlined"
                   defaultValue={data.user_name}
                   //onChange={(e) => setName(e.target.value)}
@@ -380,6 +388,10 @@ export default function DetailRequestSelfRepair() {
                     shrink: true,
                     readOnly: true,
                   }}
+                  InputProps={{
+                              readOnly: true,
+                            }}
+                  
                   variant="outlined"
                   defaultValue={data.time}
                   //onChange={(e) => setName(e.target.value)}
@@ -395,6 +407,10 @@ export default function DetailRequestSelfRepair() {
                     shrink: true,
                     readOnly: true,
                   }}
+                  InputProps={{
+                              readOnly: true,
+                            }}
+                  
                   variant="outlined"
                   defaultValue={data.contact}
                   //onChange={(e) => setName(e.target.value)}
@@ -410,6 +426,10 @@ export default function DetailRequestSelfRepair() {
                     shrink: true,
                     readOnly: true,
                   }}
+                  InputProps={{
+                              readOnly: true,
+                            }}
+                  
                   variant="outlined"
                   defaultValue={data.status_value}
                   //onChange={(e) => setName(e.target.value)}

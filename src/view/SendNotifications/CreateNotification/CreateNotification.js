@@ -19,6 +19,10 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import LoadingOverlay from "react-loading-overlay";
 import Snackbar from "../../../component/SnackBar/Snackbar.js"
 import FloorNotification from "./Floor/FloorNotifications.js"
+import ApartNotifications from "./Apart/ApartNotifications"
+
+import Zoom from 'react-medium-image-zoom'
+import 'react-medium-image-zoom/dist/styles.css'
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -113,6 +117,7 @@ export default function CreateNotification() {
   const handleType = (value) => {
     console.log(value);
     setType(value);
+    setApart_id("")
     //setReload(!reload);
   };
   const renderTo = () => {
@@ -127,6 +132,10 @@ export default function CreateNotification() {
     if (type==="floor")
     {
       return <FloorNotification setBlock={setBlock} setFloor={setFloor} setApart_id={setApart_id} handleOpenLoading={handleOpenLoading}handleCloseLoading={handleCloseLoading} handleOpenSnackBar={handleOpenSnackBar}/>
+    }
+    if(type==="apart")
+    {
+      return <ApartNotifications setApart_id={setApart_id} handleOpenLoading={handleOpenLoading}handleCloseLoading={handleCloseLoading} handleOpenSnackBar={handleOpenSnackBar} ></ApartNotifications>
     }
   };
   const handeFile = async (file, imageUrl) => {
@@ -279,10 +288,26 @@ export default function CreateNotification() {
           floor: floor,
           apart_id:apart_id
         };
-        
         console.log(body);
         sendNotification(body);
       }
+      if (type === "apart") {
+        //console.log("block true");
+        const body = {
+          title: title,
+          content: content,
+          link: link,
+          type: type,
+          image: key[0],
+          apart_id:apart_id
+        };
+        console.log(body);
+        sendNotification(body);
+      }
+    }
+    else {
+      handleCloseLoading()
+      handleOpenSnackBar(false)
     }
   };
   const sendNotification = async (body) => {
@@ -400,7 +425,7 @@ export default function CreateNotification() {
             <GridItem xs={12} sm={12} md={3}>
               {alertTitle && (
                 <Alert className={classes.alerts} severity="error">
-                  Tiêu đề hộ không hợp lệ
+                  Tiêu đề không hợp lệ
                 </Alert>
               )}
             </GridItem>
@@ -458,7 +483,6 @@ export default function CreateNotification() {
                 style={{ marginTop: "15px" }}
                 type="file"
                 onChange={(e) => handeFile(e.target.files, e.target.value)}
-                multiple
                 accept="image/*"
               />
             </GridItem>
@@ -466,11 +490,12 @@ export default function CreateNotification() {
               <GridItem xs={12} sm={12} md={6}>
                 {isSelectFile &&
                   review.map((option) => (
+                    <Zoom zoomMargin={40}>
                     <img
                       src={option.src}
                       alt="Girl in a jacket"
                       style={{ width: "100px", height: "100px" }}
-                    ></img>
+                    ></img></Zoom>
                   ))}
                 {/* {<img src={review[0].src} alt="Girl in a jacket" style={{width:"30px",height:"30px"}}></img>} */}
                 {/* {<img src={review[1].src} alt="Girl in a jacket" style={{width:"30px",height:"30px"}}></img>} */}

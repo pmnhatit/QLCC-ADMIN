@@ -27,7 +27,6 @@ import IconButton from "@material-ui/core/IconButton";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import SearchIcon from '@material-ui/icons/Search';
 import PushNotiAdmin from "../../PushNotiAdmin.js"
-import Search from "@material-ui/icons/Search";
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -81,12 +80,13 @@ export default function DetailPublicArea(props) {
   const [snackType, setSnackType] = useState(true);
   const [isHandle, setIsHandle] = useState(false);
   const [image, setImage] = useState();
+  const [commentImage, setCommentImage] = useState();
   const [isLoad, setIsLoad] = useState(true);
   const [open, setOpen] = useState(false);
   const [reload, setReload] = useState(false);
   const [selected, setSelected] = useState(true); // true:chấp nhận|| false:không chấp nhận
   //   const token = useSelector((state) => state.user.token);
-  const [dataLicense,setDataLicense]=useState("");
+  const [copy, setCopy] = useState({ value: "", copied: false });
   const handleChangeStatus = async () => {
     try {
       handleClose();
@@ -262,38 +262,6 @@ export default function DetailPublicArea(props) {
   const handleClose = () => {
     setOpen(false);
   };
-  const searchUser =async(license)=>
-  {
-    try {
-      const res = await fetch(
-        process.env.REACT_APP_API_LINK + `/api/user/search?search=${license}`,
-        {
-          // get apart
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + `${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (res.status === 200) {
-        const result = await res.json();
-        console.log("get phone OK");
-        console.log(result.data[0].phone);
-        setDataLicense(result.data[0].phone)
-        
-      } else {
-        const result = await res.json();
-        console.log(result.message); 
-        setDataLicense("Không tìm thấy")
-        //handleOpenSnackBar(false);
-      }
-    } catch (err) {
-      console.log(err);
-      handleOpenSnackBar(false);
-    }
-  }
   const getUserAndApart = async (data) => {
     try {
       const res = await fetch(
@@ -384,8 +352,7 @@ export default function DetailPublicArea(props) {
                   </a>
                 </CardAvatar>
               </Card>
-
-              {!data.is_confirm &&<GridContainer>
+              <GridContainer>
               <GridItem xs={12} sm={12} md={6}>
                 <TextField
                   id="author"
@@ -397,28 +364,25 @@ export default function DetailPublicArea(props) {
                     shrink: true,
                   }}
                   variant="outlined"
-                  onChange={(e) =>searchUser(e.target.value)}
+                  onChange={(e) =>
+                    setCopy({ value: e.target.value, copied: false })
+                  }
                 />
               </GridItem>
               <GridItem xs={12} sm={12} md={6}>
-              <TextField
-                  id="phone"
-                  label="Số điện thoại"
-                  //style={{ margin: 8 }}
-                  width="100"
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  InputProps={{
-                              readOnly: true,
-                            }}
-                  variant="outlined"
-                  value={dataLicense}
-                />
-              
+                <CopyToClipboard
+                  text={copy.value}
+                  onCopy={() => setCopy({ copied: true })}
+                >
+                  <IconButton style={{marginTop:"20px", float:"left" }} aria-label="delete">
+                    <FileCopyIcon color="primary" />
+                  </IconButton >
+                </CopyToClipboard>
+                <IconButton style={{marginTop:"20px", float:"left" }} aria-label="delete" onClick={e=>history.push('/admin/user_account')}>
+                    <SearchIcon  color="primary" />
+                  </IconButton >
               </GridItem>
-              </GridContainer>}
+              </GridContainer>
             </GridItem>
             <GridItem xs={12} sm={12} md={7}>
               <CardHeader color="primary">

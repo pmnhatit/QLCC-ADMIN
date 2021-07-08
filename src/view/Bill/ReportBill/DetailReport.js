@@ -22,6 +22,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useParams, useHistory } from "react-router-dom";
 import NumberFormat from 'react-number-format';
+import PushNotiAdmin from "../../PushNotiAdmin.js"
 const useStyles = makeStyles((theme) => ({
 
   cardTitleWhite: {
@@ -49,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 export default function DetailReport(props) {
   //const dispatch = useDispatch();
-
+  const {PushNotificationAdmin}=PushNotiAdmin()
   const classes = useStyles();
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
@@ -71,7 +72,7 @@ export default function DetailReport(props) {
   const [snackType,setSnackType]=useState(true);
 const [isHandle,setIsHandle]=useState(false); 
 const [reload,setReload]=useState(true);
-
+const [token_device,setToken_device]=useState("");
 
   const handleSubmit = async () => {
     handleClose();
@@ -110,9 +111,12 @@ const [reload,setReload]=useState(true);
         console.log("ok");
         if(await handleChangeReport()){
           if (selected) await handleChangeStatus();
-          // else history.push(`/admin/reportbill`)
+            
             setReload(!reload)
             handleCloseLoading()
+            PushNotification()
+            handleOpenSnackBar(true)
+            PushNotificationAdmin()
         }
         else{ handleOpenSnackBar(false)
           handleCloseLoading()}
@@ -149,6 +153,7 @@ const [reload,setReload]=useState(true);
       if (res.status === 200) {
         //const result = await res.json();
         console.log("ok");
+       
         handleOpenSnackBar(true)
         handleCloseLoading()
         return true
@@ -163,6 +168,50 @@ const [reload,setReload]=useState(true);
       handleOpenSnackBar(false)
       handleCloseLoading()
       
+    }
+  };
+  const PushNotification = async () => {
+    try {
+      let body
+      if (selected)
+      body = {
+        tokens: [token_device],
+        title: "Khiếu nại đã được xử lý",
+        content:
+          "BQL chung cư thông báo, khiếu nại của anh/chị đã được giải quyết. Đề nghị kiểm tra lại.",
+          type: 1,
+      };
+    else
+      body = {
+        tokens: [token_device],
+        title: "Khiếu nại không được xác nhận",
+        content:
+          "BQL chung cư thông báo, khiếu nại của anh/chị chưa hợp lệ. Đề nghị liên hệ BQL để giải quyết.",
+          type: 1,
+      };
+
+      console.log(body);
+      const res = await fetch(
+        process.env.REACT_APP_API_LINK + `/api/push-noti/add-notice`,
+        {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            Authorization: "Bearer " + `${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      if (res.status === 200) {
+        //const result = await res.json();
+        console.log("push noti ok");
+        //history.push(`/admin/reportbill`);
+      } else {
+        console.log("SOMETHING WENT WRONG");
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
   const handleChangeReport = async () => {
@@ -261,6 +310,36 @@ const [reload,setReload]=useState(true);
     else
    return [""]
   };
+
+  const getTokenApart = async (data) => {
+    try {
+      const res = await fetch(
+        process.env.REACT_APP_API_LINK + `/api/user/token-device/${data}`,
+        {
+          // get apart
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + `${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        const result = await res.json();
+        console.log("user OK");
+        console.log(result);
+        setToken_device(result.token_device)
+      } else {
+        const result = await res.json();
+        console.log(result.message);
+        handleOpenSnackBar(false);
+      }
+    } catch (err) {
+      console.log(err);
+      handleOpenSnackBar(false);
+    }
+  };
   useEffect(() => {
     const getRes = async () => {
       try{
@@ -281,6 +360,7 @@ const [reload,setReload]=useState(true);
         console.log("Vo 200OK");
         console.log(result.data);
         setData(result.data);
+        await getTokenApart(result.data.apart_id)
         setImage(await getUrl(await result.data.image));
         setIsLoad(false);
       } else {
@@ -326,7 +406,7 @@ const [reload,setReload]=useState(true);
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.apart_name || ""}
+                  value={data.apart_name || ""}
                   //onChange={(e) => setName(e.target.value)}
                 />
 
@@ -343,7 +423,7 @@ const [reload,setReload]=useState(true);
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={data.month + "/" + data.year}
+                  value={data.month + "/" + data.year}
                   //onChange={(e) => setName(e.target.value)}
                 />
 
@@ -359,7 +439,7 @@ const [reload,setReload]=useState(true);
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={value}
+                 value={value}
                 />} />
                 <NumberFormat value={data.water_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) =>  <TextField
                   id="water"
@@ -373,7 +453,7 @@ const [reload,setReload]=useState(true);
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={value}
+                value={value}
                 />} />
                <NumberFormat value={data.other_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) =>  <TextField
                   id="other"
@@ -388,7 +468,7 @@ const [reload,setReload]=useState(true);
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={value}
+                  value={value}
                 />} />
                <NumberFormat value={data.total_money} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) =>  
                <TextField
@@ -404,7 +484,7 @@ const [reload,setReload]=useState(true);
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={value}
+                  value={value}
                   //onChange={(e) => setName(e.target.value)}
                 />} />
                 <TextField
@@ -420,7 +500,7 @@ const [reload,setReload]=useState(true);
                     readOnly: true,
                   }}
                   variant="outlined"
-                  defaultValue={
+                  value={
                     data.is_pay ? "Đã thanh toán" : "Chưa thanh toán"
                   }
                   //onChange={(e) => setName(e.target.value)}

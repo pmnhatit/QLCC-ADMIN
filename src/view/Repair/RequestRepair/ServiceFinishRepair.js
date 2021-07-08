@@ -1,3 +1,6 @@
+import ThumbDownIcon from "@material-ui/icons/ThumbDown";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+
 export const handleData = (data, apart) => {
     console.log(data);
     const newdata = [];
@@ -14,7 +17,8 @@ export const handleData = (data, apart) => {
           apart: returnApart(data[i].apart_id, apart),
           is_read_admin:data[i].is_read_admin,
           is_read_admin_value:(data[i].is_read_admin ?<div style={{color:"green"}}>Đã đọc</div> :<div style={{color:"red"}}>Chưa đọc</div>),
-          is_read_admin_name:(data[i].is_read_admin ?"Đã đọc":"Chưa đọc")
+          is_read_admin_name:(data[i].is_read_admin ?"Đã đọc":"Chưa đọc"),
+          evaluation:data[i].evaluation.is_evaluate?(data[i].evaluation.is_like?<ThumbUpIcon /> : <ThumbDownIcon />):<div>__</div>
         };
       }
     }
@@ -26,9 +30,3 @@ export const handleData = (data, apart) => {
       if (item._id === apart) return item.name;
     }
   };
-  // console.log("Date: "+date.getDate()+
-  //       "/"+(date.getMonth()+1)+
-  //       "/"+date.getFullYear()+
-  //       " "+date.getHours()+
-  //       ":"+date.getMinutes()+
-  //       ":"+date.getSeconds());

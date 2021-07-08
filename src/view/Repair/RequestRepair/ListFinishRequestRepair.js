@@ -1,31 +1,30 @@
+import Fab from "@material-ui/core/Fab";
+import { makeStyles } from "@material-ui/core/styles";
+import Tooltip from "@material-ui/core/Tooltip";
+import EditIcon from "@material-ui/icons/Edit";
+import MUIDataTable from "mui-datatables";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { handleData } from "./ServiceListApart.js";
-import CustomButton from "../../../component/CustomButtons/Button.js"
 import { useHistory } from "react-router-dom";
-import MUIDataTable from "mui-datatables";
-import EditIcon from '@material-ui/icons/Edit';
-import Tooltip from "@material-ui/core/Tooltip";
-import Fab from '@material-ui/core/Fab';
 import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
-import { makeStyles } from "@material-ui/core/styles";
-import LoadingOverlay from "react-loading-overlay";
+import { handleData } from "./ServiceFinishRepair.js";
 import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
 const useStyles = makeStyles(styles);
-export default function ListApart() {
+export default function LinkRequestRepair(props) {
   const classes = useStyles();
   const history = useHistory();
+  const { type, status } = props;
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
-  const [isHandle,setIsHandle]=useState(false);
   const [openSnackBar,setOpenSnackBar]=useState(false);
   const [snackType,setSnackType]=useState(true);
-  console.log( JSON.parse(localStorage.getItem("state")).user.token!=="");
+const [isHandle,setIsHandle]=useState(false);
   const options = {
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
-    downloadOptions:{filterOptions:{useDisplayedRowsOnly:true}}
+    download: false,
   };
   const columns = [
     {
@@ -35,7 +34,6 @@ export default function ListApart() {
         display: "excluded",
         filter: false,
         sort: false,
-        download:false
       },
     },
     {
@@ -44,117 +42,87 @@ export default function ListApart() {
       options: {
         filter: false,
         sort: true,
-        download:false
       },
     },
     {
-      name: "name",
+      name: "apart",
       label: "Tên phòng",
       options: {
         filter: true,
         sort: false,
-        download:false
       },
     },
     {
-      name: "block",
-      label: "Toà nhà",
+      name: "time",
+      label: "Ngày tạo",
       options: {
         filter: true,
-        sort: false,
-        download:false
-      },
-    },
-    {
-      name: "status",
-      label: "Tình trạng",
-      options: {
-        filter: false,
-        sort: false,
-        download:false
-      },
-    },
-    {
-      name: "status_name",
-      label: "Tình trạng",
-      options: {
-        display: "excluded",
-        filter: true,
-        sort: false,
-        download:false
-      },
-    },
-    {
-      name: "order",
-      label: "Order",
-      options: {
-        filter: false,
         sort: true,
-        display: "excluded",
       },
     },
     {
-      name: "name",
-      label: "Apart Name",
+      name: "is_read_admin",
+      label: "",
+      options: {
+        display: false,
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "is_read_admin_value",
+      label: "Tình trạng",
       options: {
         filter: false,
         sort: false,
-        display: "excluded",
       },
     },
     {
-      name: "block",
-      label: "Block",
-      options: {
-        filter: false,
-        sort: false,
-        display: "excluded",
-      },
-    },
-   
-    {
-      name: "status_name_download",
-      label: "Status",
+      name: "is_read_admin_name",
+      label: "Tình trạng.",
       options: {
         display: "excluded",
-        filter: false,
+        filter: true,
         sort: false,
-       
+      },
+    },{
+      name: "evaluation",
+      label: "Đánh giá",
+      options: {
+        filter: true,
+        sort: false,
       },
     },
     {
-      name: "",
-      options: { filter: false,
-        sort: false,
+      name: "Chi tiết",
+      options: {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <div>
-            <Tooltip
-            id="tooltip-top"
-            title="Chi tiết"
-            placement="top"
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <Fab
-              size="small"
-              // color="primary"
-              aria-label="add"
-              className={classes.margin}
-              onClick={() => handleClick(tableMeta.rowData[0])}
-            >
-              <EditIcon color="primary"/>
-            </Fab>
-          </Tooltip>
-          </div>
+              <Tooltip
+                id="tooltip-top"
+                title="Chi tiết"
+                placement="top"
+                classes={{ tooltip: classes.tooltip }}
+              >
+                <Fab
+                  size="small"
+                  color="red"
+                  aria-label="add"
+                  className={classes.margin}
+                  onClick={() =>
+                    handleClick(tableMeta.rowData[0], tableMeta.rowData[4])
+                  }
+                >
+                  <EditIcon color="primary" />
+                </Fab>
+              </Tooltip>
+            </div>
           );
         },
       },
     },
   ];
-  const handleClick = (id) => {
-
-    history.push(`/admin/apart/detail/${id}`);
-  };
   const handleOpenSnackBar = (type) => {
     if (type) setSnackType(true);
     else setSnackType(false);
@@ -166,20 +134,55 @@ export default function ListApart() {
     }
     setOpenSnackBar(false);
   };
-  const handleOpenLoading=()=>{
+ const handleOpenLoading=()=>{
     setIsHandle(true);
   }
   const handleCloseLoading=()=>{
     setIsHandle(false);
   }
 
+  const handleClick = async (id, is_read_admin) => {
+    // e.preventDefault();
+    console.log(is_read_admin);
+    if (!is_read_admin) await handleChangeStatus(id);
+    history.push(`/admin/repair/repair/detail/${id}`);
+  };
+  const handleChangeStatus = async (id) => {
+    try {
+      const body = {
+        notice_id: id,
+        admin_status: true,
+      };
+
+      console.log(body);
+      const res = await fetch(
+        process.env.REACT_APP_API_LINK + `/api/repair/admin/update-is-read`,
+        {
+          method: "PUT",
+          mode: "cors",
+          headers: {
+            Authorization: "Bearer " + `${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      if (res.status === 200) {
+        console.log("ok");
+      } else {
+        console.log("SOMETHING WENT WRONG");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   useEffect(() => {
     handleOpenLoading()
-   
-    const getRes = async () => { 
+    const getRes = async () => {
       try{
       const res = await fetch(
-        process.env.REACT_APP_API_LINK + `/api/apart/all-aparts`,
+        process.env.REACT_APP_API_LINK +
+          `/api/repair/notices?type=${type}&status=${status}`,
         {
           // get apart
           method: "GET",
@@ -190,9 +193,9 @@ export default function ListApart() {
         }
       );
       const res1 = await fetch(
-        process.env.REACT_APP_API_LINK + `/api/block/all`,
+        process.env.REACT_APP_API_LINK + `/api/apart/all-aparts`,
         {
-          // get block
+          // get apart
           method: "GET",
           headers: {
             Authorization: "Bearer " + `${token}`,
@@ -209,30 +212,27 @@ export default function ListApart() {
         handleCloseLoading()
       } else {
         const result = await res.json();
-        alert(result.message);
-        handleCloseLoading()
+        console.log(result.message);
         handleOpenSnackBar(false)
-      }}
-      catch (err) {
+        handleCloseLoading()
+      }}catch (err) {
         console.log(err);
         handleOpenSnackBar(false)
         handleCloseLoading()
       }
-  }
+    };
     getRes();
   }, []);
   return (
     <div>
-      <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
+       <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       <MUIDataTable
         title={""}
         data={data}
         columns={columns}
         options={options}
-      />
-      
-      </LoadingOverlay>
-      <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
+      /></LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import NumberFormat from 'react-number-format';
+var numeral = require('numeral');
 export const handleData=(data,apart)=>
 {
     console.log(data);
@@ -12,14 +12,15 @@ export const handleData=(data,apart)=>
             order: i + 1,
             time :data[i].month+"/"+data[i].year,
             apart: returnApart(data[i].apart_id,apart), 
-            apart_management:<NumberFormat value={data[i].apart_management} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
-            parking_fees:<NumberFormat value={data[i].parking_fees} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
-            maintenance_fee:<NumberFormat value={data[i].maintenance_fee} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
-            service_charge:<NumberFormat value={data[i].service_charge} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
-            total_money: data[i].total_money,
-            total:<NumberFormat value={data[i].total_money} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
+            apart_management:numeral(data[i].apart_management).format('0,0,0') + " VND",
+            parking_fees:numeral(data[i].parking_fees).format('0,0,0') + " VND",
+            maintenance_fee:numeral(data[i].maintenance_fee).format('0,0,0') + " VND",
+            service_charge:numeral(data[i].service_charge).format('0,0,0') + " VND",
+            total_money:data[i].total_money ,
+            total:numeral(data[i].total_money).format('0,0,0') + " VND",
             note:data[i].note,
-            is_pay: data[i].is_pay ?"Đã thanh toán":"Chưa thanh toán",//(<div style={{color:"green"}}>Đã thanh toán</div> ):<div style={{color:"red"}}>Chưa thanh toán</div>
+            is_pay: data[i].is_pay ?"Đã thanh toán":"Chưa thanh toán",
+            is_pay_download: data[i].is_pay ?"Paid":"Unpaid",
             is_pay_value: data[i].is_pay ?(<div style={{color:"green"}}>Đã thanh toán</div> ):<div style={{color:"red"}}>Chưa thanh toán</div>,
             flag:data[i].is_pay
         }} 

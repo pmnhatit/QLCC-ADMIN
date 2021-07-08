@@ -46,6 +46,7 @@ const [isHandle,setIsHandle]=useState(false);
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
+    downloadOptions:{filterOptions:{useDisplayedRowsOnly:true}}
   };
   const columns = [
     {
@@ -55,14 +56,16 @@ const [isHandle,setIsHandle]=useState(false);
         display: "excluded",
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
       name: "order",
-      label: "Số thứ tự",
+      label: "STT",
       options: {
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -71,6 +74,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: true,
         sort: false,
+        download:false
       },
     },
     {
@@ -80,6 +84,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: false,
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
@@ -89,6 +94,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: false,
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -98,15 +104,17 @@ const [isHandle,setIsHandle]=useState(false);
         display: false,
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
       name: "other",
-      label: "Chi phí khác",
+      label: "Phí khác",
       options: {
         display: false,
         filter: false,
         sort: true,
+        download:false
       },
     },
 
@@ -116,6 +124,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -125,6 +134,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: "excluded",
         filter: true,
         sort: false,
+        download:false
       },
     },
     {
@@ -134,6 +144,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: "excluded",
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
@@ -143,11 +154,110 @@ const [isHandle,setIsHandle]=useState(false);
         //display: "excluded",
         filter: false,
         sort: false,
+        download:false
+      },
+    },
+    {
+      name: "is_active",
+      label: "Tình trạng chủ căn hộ",
+      options: {
+        display: "false",
+        filter: true,
+        sort: false,
+        download:false
+      },
+    },
+    {
+      name: "order",
+      label: "Order",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "apart",
+      label: "Apart",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "time",
+      label: "Time",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+        
+      },
+    },
+    {
+      name: "electric",
+      label: "Electric fee",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+        
+      },
+    },
+    {
+      name: "water",
+      label: "Water fee",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+       
+      },
+    },
+    {
+      name: "other",
+      label: "Other fee",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+
+    {
+      name: "total",
+      label: "Total",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "is_pay_download",
+      label: "Is pay",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "is_active_download",
+      label: "Owner's status",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
       },
     },
     {
       name: "",
       options: {
+        filter: false,
+        sort: false,
+        download:false,
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <div>
@@ -205,6 +315,7 @@ const [isHandle,setIsHandle]=useState(false);
             
           );
         },
+        
       },
     },
   ];
@@ -315,7 +426,7 @@ const [isHandle,setIsHandle]=useState(false);
         
         const result = await res.json();
         const result1 = await res1.json();
-        console.log(result);
+        console.log(result.data);
         setData(await handleData(result.data, result1.data));
         setStatis(calTotal(result.data));
         handleCloseLoading()
@@ -372,8 +483,8 @@ const [isHandle,setIsHandle]=useState(false);
         <DialogTitle id="alert-dialog-slide-title">{selectedRow[9]||false?"Xác nhận hủy thanh toán":"Xác nhận thanh toán"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Căn hộ: {selectedRow[2]}       
-            Tổng tiền: {selectedRow[7]}
+           <div>Căn hộ: {selectedRow[2]} </div> 
+            <div>Tổng tiền: {selectedRow[7]}</div>
           </DialogContentText>
         </DialogContent>
         <DialogActions>

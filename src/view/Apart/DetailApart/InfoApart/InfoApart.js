@@ -228,6 +228,23 @@ export default function InfoApart(props) {
                 defaultValue={data.owner_info.identify_card}
                 variant="outlined"
               />
+            </GridItem>
+            <GridItem xs={12} sm={12} md={9}>
+              <TextField
+                id="cmnd"
+                label="Tình trạng chủ hộ"
+                //style={{ margin: 8 }}
+                fullWidth
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                InputProps={{
+                  readOnly: true,
+                }}
+                defaultValue={data.owner.is_active?"Có sử dụng app":"Không sử dụng app"}
+                variant="outlined"
+              />
             </GridItem> 
             </>:<></>}    
           </GridContainer>

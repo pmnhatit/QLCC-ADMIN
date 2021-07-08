@@ -12,9 +12,12 @@ export const handleData = (data, apart) => {
             (createdate.getMonth() + 1) +
             "/" +
             createdate.getFullYear(),
-        title:data[i].title
-    
+          title:data[i].title
         };
       }
     return newdata;
   };
+  const returnType =()=>
+  {
+
+  }

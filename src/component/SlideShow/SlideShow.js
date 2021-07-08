@@ -23,7 +23,7 @@ export default function DemoCarousel(props) {
            )
         else 
                return( 
-                 <img style={{width:"30px"}} src={process.env.PUBLIC_URL + '/noImage.jpg'}></img>
+                 <img style={{width:"80px"}} src={process.env.PUBLIC_URL + '/noImage.jpg'}></img>
                 )
     }
         return (

@@ -81,7 +81,7 @@ export default function RequestSelfRepair() {
                 tabName: "Không duyệt",
                 //tabIcon: Code,
                 tabContent: (
-                  <ListRequestSelfRepair type={2} status={3}/>
+                  <ListRequestSelfRepair type={1} status={3}/>
                 )
               },
               

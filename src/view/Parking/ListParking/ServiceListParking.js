@@ -14,7 +14,10 @@ export const handleData = (data, user) => {
           //apart: returnApart(data[i].apart_id, apart),
           user: returnUser(data[i].author,user),
           is_read_admin:data[i].is_read_admin,
-          is_read_admin_value:(data[i].is_read_admin ?<div style={{color:"green"}}>Đã đọc</div> :<div style={{color:"red"}}>Chưa đọc</div>)
+          is_read_admin_value:(data[i].is_read_admin ?<div style={{color:"green"}}>Đã đọc</div> :<div style={{color:"red"}}>Chưa đọc</div>),
+          is_read_admin_name:(data[i].is_read_admin ?"Đã đọc":"Chưa đọc"),
+          is_confirm :data[i].is_confirm?<div style={{color:"green"}}>Đã xử lý</div> :<div style={{color:"red"}}>Chưa xử lý</div>,
+          is_confirm_name :data[i].is_confirm?"Đã xử lý" :"Chưa xử lý"
         };
       }
     }

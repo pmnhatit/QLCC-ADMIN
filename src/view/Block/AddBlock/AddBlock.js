@@ -40,7 +40,10 @@ const useStyles = makeStyles((theme) => ({
   },
   alerts:{
     marginTop:"18px"
-  }
+  },
+  myButton:{
+    float: "right"
+ }
 }));
 export default function AddBlock() {
   const classes = useStyles();
@@ -114,7 +117,7 @@ export default function AddBlock() {
               {alertApartName && <Alert className={classes.alerts} severity="error">Tên tòa nhà không hợp lệ</Alert>}
             </GridItem>
             <GridContainer />   
-          <Button color="primary" onClick={(e) => handleSubmit(e)}>
+          <Button className={classes.myButton} color="primary" onClick={(e) => handleSubmit(e)}>
             Lưu lại
           </Button>
         </GridItem>

@@ -22,7 +22,9 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useParams, useHistory } from "react-router-dom";
 import { handleData, title, content } from "../ServiceDetail.js";
-
+import PushNotiAdmin from "../../PushNotiAdmin.js"
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
+import LoadingOverlay from "react-loading-overlay";
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -57,6 +59,7 @@ export default function DetailRequestRepair(props) {
   //const dispatch = useDispatch();
 
   const classes = useStyles();
+  const {PushNotificationAdmin}=PushNotiAdmin()
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
   const { notice_id } = useParams();
@@ -83,6 +86,9 @@ export default function DetailRequestRepair(props) {
   const [open, setOpen] = useState(false);
   const [open1, setOpen1] = useState(false);
   const [reload, setReload] = useState(false);
+  const [openSnackBar,setOpenSnackBar]=useState(false);
+  const [snackType,setSnackType]=useState(true);
+const [isHandle,setIsHandle]=useState(false); 
   //const [selected, setSelected] = useState(true); // true:chấp nhận|| false:không chấp nhận
   //   const token = useSelector((state) => state.user.token);
 
@@ -90,6 +96,7 @@ export default function DetailRequestRepair(props) {
     try {
       handleClose();
       handleClose1();
+      handleOpenLoading()
       const body = {
         notice_id: data._id,
         status: next_status,
@@ -112,15 +119,22 @@ export default function DetailRequestRepair(props) {
         //const result = await res.json();
         console.log("ok");
         await PushNotification();
+        PushNotificationAdmin();
         setIsError(false);
         setReload(!reload);
         //history.push(`/admin/reportbill`);
+        handleOpenSnackBar(true)
+        handleCloseLoading()
       } else {
         console.log("SOMETHING WENT WRONG");
         setIsError(true);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     } catch (err) {
       console.log(err);
+      handleOpenSnackBar(false)
+        handleCloseLoading()
     }
   };
   const PushNotification = async () => {
@@ -184,6 +198,7 @@ export default function DetailRequestRepair(props) {
         }
       } catch (err) {
         console.log(err);
+        
       }
     }
     setIsLoad(false);
@@ -233,8 +248,25 @@ export default function DetailRequestRepair(props) {
         </Button>
       );
     }
+  }; const handleOpenSnackBar = (type) => {
+    if (type) setSnackType(true);
+    else setSnackType(false);
+    setOpenSnackBar(true);
   };
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackBar(false);
+  };
+ const handleOpenLoading=()=>{
+    setIsHandle(true);
+  }
+  const handleCloseLoading=()=>{
+    setIsHandle(false);
+  }
   const getUserAndApart = async (data) => {
+    try{
     const res = await fetch(
       process.env.REACT_APP_API_LINK + `/api/user/${data.author}`,
       {
@@ -263,16 +295,21 @@ export default function DetailRequestRepair(props) {
       const result1 = await res1.json();
       console.log("Vo 200OK");
       setData(handleData(data, result.data, result1.data));
-      //setData(result.data);
       setIsLoad(false);
     } else {
       const result = await res.json();
       console.log(result.message);
+      handleOpenSnackBar(false)
     }
+  }catch (err) {
+    console.log(err);
+    handleOpenSnackBar(false)
+  }
   };
   useEffect(() => {
     setIsLoad(true);
     const getRes = async () => {
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/repair/${notice_id}`,
         {
@@ -297,13 +334,19 @@ export default function DetailRequestRepair(props) {
       } else {
         const result = await res.json();
         console.log(result.message);
+        handleOpenSnackBar(false)
       }
+    }catch (err) {
+      console.log(err);
+      handleOpenSnackBar(false)
+      
+    }
     };
     getRes();
   }, [reload]);
 
   return (
-    <div>
+    <div> <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       {!isLoad ? (
         <GridContainer>
           <GridItem xs={12} sm={12} md={5}>
@@ -336,6 +379,8 @@ export default function DetailRequestRepair(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.apart_name || ""}
@@ -350,6 +395,8 @@ export default function DetailRequestRepair(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.time}
@@ -364,6 +411,8 @@ export default function DetailRequestRepair(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.author_name}
@@ -377,6 +426,8 @@ export default function DetailRequestRepair(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.title}
@@ -390,6 +441,8 @@ export default function DetailRequestRepair(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.content}
@@ -403,6 +456,8 @@ export default function DetailRequestRepair(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.status_value}
@@ -507,6 +562,10 @@ export default function DetailRequestRepair(props) {
           </CardBody>
         </GridItem>}
       </GridContainer>
+
+      </LoadingOverlay>
+  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
+
     </div>
   );
 }

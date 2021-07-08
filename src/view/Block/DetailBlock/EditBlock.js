@@ -34,9 +34,8 @@ const useStyles = makeStyles((theme) => ({
     flexWrap: "wrap",
   },
   textField: {
-    marginLeft: theme.spacing(1),
+    marginLeft: theme.spacing(2),
     marginRight: theme.spacing(1),
-    width: "25ch",
   },
   alerts:{
     marginTop:"18px"
@@ -198,6 +197,7 @@ export default function EditBlock() {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                className={classes.textField}
                 variant="outlined"
                 onChange={(e) => checkApartName(e.target.value)}
               />

@@ -1,5 +1,5 @@
 
-import NumberFormat from 'react-number-format';
+var numeral = require('numeral');
 export const handleData=(data,apart)=>
 {
     console.log(data);
@@ -12,12 +12,13 @@ export const handleData=(data,apart)=>
               order: i + 1,
               time: data[i].month + "/" + data[i].year,
               apart: returnApart(data[i].apart_id, apart),
-              old_index: data[i].old_index,
-              new_index: data[i].new_index,
-              consume: data[i].consume,
+              old_index:  numeral(data[i].old_index).format('0,0,0'),
+              new_index:  numeral(data[i].new_index).format('0,0,0'),
+              consume:  numeral(data[i].consume).format('0,0,0'),
               total_money: data[i].total_money,
-              total:<NumberFormat value={data[i].total_money} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
-              is_pay: data[i].is_pay ?"Đã thanh toán":"Chưa thanh toán",//(<div style={{color:"green"}}>Đã thanh toán</div> ):<div style={{color:"red"}}>Chưa thanh toán</div>
+              total:numeral(data[i].total_money).format('0,0,0') + " VND",
+              is_pay: data[i].is_pay ?"Đã thanh toán":"Chưa thanh toán",
+              is_pay_download: data[i].is_pay ?"Paid":"Unpaid",
               is_pay_value: data[i].is_pay ?(<div style={{color:"green"}}>Đã thanh toán</div> ):<div style={{color:"red"}}>Chưa thanh toán</div>,
               flag:data[i].is_pay
             };

@@ -39,7 +39,7 @@ const useStyles = makeStyles(styles);
 
 export default function LoadPlace(props) {
   const classes = useStyles();
-  const { service_id, service_name, draw_date, date, reload, show } = props;
+  const { service_id, service_name, draw_date, date, reload, show ,setTerm} = props;
 
   const token = useSelector((state) => state.user.token);
   const [isLoad, setIsLoad] = useState(false);
@@ -68,6 +68,7 @@ export default function LoadPlace(props) {
             console.log("ook LoadPlace");
             console.log(result.data);
             setData(await findDate(result.data[0].registed, draw_date)); //1621616400000
+            setTerm (await findDate(result.data[0].registed, draw_date));
             console.log(await findDate(result.data[0].registed, draw_date));
             setIsLoad(false);
           } else {
@@ -83,8 +84,7 @@ export default function LoadPlace(props) {
   }, [reload]);
   return (
     <>
-      <div>Chọn "Ngày sử dụng" và "Địa điểm" để xem lịch trình trong ngày</div>
-      <br />
+      <h4 style={{color:"red"}}>Lọc "Ngày sử dụng" và "Địa điểm" để xem lịch trình trong ngày trước khi xử lý</h4>
 
       <hr />
       {isLoad && <div>Đang xử lý...</div>}

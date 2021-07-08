@@ -122,6 +122,7 @@ export default function AddAdmin() {
   };
   const checkPassword = (value) => { 
      setPassword(value);
+     checkconfirm(confirm,value)
     if (value !== "") {
       setAlertPassword(false);
       return true;
@@ -130,7 +131,7 @@ export default function AddAdmin() {
       return false;
     }
   };
-  const checkconfirm = (value) => {
+  const checkconfirm = (value,password) => {
     setConfirm(value);
     if (value !== "" && value===password) {
       setAlertConfirm(false);
@@ -176,7 +177,7 @@ export default function AddAdmin() {
       checkEmail(email) &&
       checkUsername(username) &&
       checkPassword(password)&&
-      checkconfirm(confirm)
+      checkconfirm(confirm,password)
     ) {
       const body = {
         name: name,
@@ -282,6 +283,7 @@ export default function AddAdmin() {
                   InputLabelProps={{
                     shrink: true,
                   }}
+                  type="number"
                   variant="outlined"
                   onChange={(e) => checkPhone(e.target.value)}
                 />
@@ -311,7 +313,7 @@ export default function AddAdmin() {
               <GridItem xs={12} sm={12} md={3}>
                 {alertUsername && (
                   <Alert className={classes.alerts} severity="error">
-                    Số CMND không hợp lệ
+                    Tên không hợp lệ
                   </Alert>
                 )}
               </GridItem>
@@ -347,7 +349,7 @@ export default function AddAdmin() {
                   }}
                   variant="outlined"
                   type="password"
-                  onChange={(e) => checkconfirm(e.target.value)}
+                  onChange={(e) => checkconfirm(e.target.value,password)}
                 />
               </GridItem>
               <GridItem xs={12} sm={12} md={3}>
@@ -376,7 +378,7 @@ export default function AddAdmin() {
         aria-describedby="alert-dialog-slide-description"
       >
         <DialogTitle id="alert-dialog-slide-title">
-                  Xác nhận chỉnh sửa
+                  Xác nhận tạo tài khoản
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">

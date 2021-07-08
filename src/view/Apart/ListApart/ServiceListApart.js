@@ -11,6 +11,8 @@ export const handleData = (apart, block) => {
         name: apart[i].name,
         block: returnBlock(apart[i].block, block),
         status: returnStatus(apart[i].status),
+        status_name: apart[i].status===2 ?"Đã bán": "Còn trống",
+        status_name_download: apart[i].status===2 ?"Sold": "Empty"
       };
     }
   }

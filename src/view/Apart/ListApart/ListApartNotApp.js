@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-
 import { useSelector } from "react-redux";
-import { handleData } from "./ServiceListBrowsePost.js";
-
+import { handleData } from "./ServiceListApart.js";
+import CustomButton from "../../../component/CustomButtons/Button.js"
 import { useHistory } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
 import EditIcon from '@material-ui/icons/Edit';
@@ -10,83 +9,124 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Fab from '@material-ui/core/Fab';
 import styles from "../../../asset/jss/material-dashboard-react/components/tasksStyle.js";
 import { makeStyles } from "@material-ui/core/styles";
-import Snackbar from "../../../component/SnackBar/Snackbar.js"
 import LoadingOverlay from "react-loading-overlay";
-
+import Snackbar from "../../../component/SnackBar/Snackbar.js"
 const useStyles = makeStyles(styles);
-
-export default function ListBrowsePost() {
+export default function ListApart() {
   const classes = useStyles();
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
+  const [isHandle,setIsHandle]=useState(false);
   const [openSnackBar,setOpenSnackBar]=useState(false);
   const [snackType,setSnackType]=useState(true);
-const [isHandle,setIsHandle]=useState(false);
-
   const options = {
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
-    download: false,
+    downloadOptions:{filterOptions:{useDisplayedRowsOnly:true}}
   };
   const columns = [
     {
       name: "id",
       label: "id",
       options: {
-        display: false,
-        filter: true,
-        sort: true,
+        display: "excluded",
+        filter: false,
+        sort: false,
+        download:false
       },
     },
     {
       name: "order",
       label: "Số thứ tự",
       options: {
-        filter: true,
-        sort: false,
+        filter: false,
+        sort: true,
+        download:false
       },
     },
     {
-      name: "title",
-      label: "Tiêu đề",
+      name: "name",
+      label: "Tên phòng",
       options: {
         filter: true,
         sort: false,
+        download:false
       },
     },
     {
-      name: "content",
-      label: "Nội dung",
-      options: {
-        display: false,
-        filter: true,
-        sort: false,
-      },
-    },
-    {
-      name: "create_date",
-      label: "Ngày tạo",
+      name: "block",
+      label: "Toà nhà",
       options: {
         filter: true,
         sort: false,
+        download:false
       },
     },
     {
-      name: "is_read_value",
+      name: "status",
       label: "Tình trạng",
       options: {
         filter: false,
         sort: false,
+        download:false
+      },
+    },
+    {
+      name: "status_name",
+      label: "Tình trạng",
+      options: {
+        display: "excluded",
+        filter: true,
+        sort: false,
+        download:false
+      },
+    },
+    {
+      name: "order",
+      label: "Order",
+      options: {
+        filter: false,
+        sort: true,
+        display: "excluded",
+      },
+    },
+    {
+      name: "name",
+      label: "Apart Name",
+      options: {
+        filter: false,
+        sort: false,
+        display: "excluded",
+      },
+    },
+    {
+      name: "block",
+      label: "Block",
+      options: {
+        filter: false,
+        sort: false,
+        display: "excluded",
+      },
+    },
+   
+    {
+      name: "status_name_download",
+      label: "Status",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+       
       },
     },
     {
       name: "",
-      options: {
+      options: { filter: false,
+        sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
-            
             <div>
             <Tooltip
             id="tooltip-top"
@@ -96,12 +136,12 @@ const [isHandle,setIsHandle]=useState(false);
           >
             <Fab
               size="small"
-              color="default"
+              // color="primary"
               aria-label="add"
               className={classes.margin}
               onClick={() => handleClick(tableMeta.rowData[0])}
             >
-              <EditIcon color="primary" />
+              <EditIcon color="primary"/>
             </Fab>
           </Tooltip>
           </div>
@@ -110,41 +150,9 @@ const [isHandle,setIsHandle]=useState(false);
       },
     },
   ];
-  const handleClick = async(id) => {
-    await handleChangeStatus(id)
-    history.push(`/admin/browse_post/detail/${id}`);
-  };
-  const handleChangeStatus = async (id) => {
-  
-    try {
-      const body=
-      {
-        post_id: id
-      }
-      console.log(body);
-      const res = await fetch(
-        process.env.REACT_APP_API_LINK + `/api/post/change-is-read`,
-        {
-          method: "PUT",
-          mode: "cors",
-          headers: {
-            Authorization: "Bearer " + `${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        }
-      );
-      if (res.status === 200) {
-        console.log("ok");
-        
-     
-      } else {
-        console.log("SOMETHING WENT WRONG");
-        
-      }
-    } catch (err) {
-      console.log(err);
-    }
+  const handleClick = (id) => {
+
+    history.push(`/admin/apart/detail/${id}`);
   };
   const handleOpenSnackBar = (type) => {
     if (type) setSnackType(true);
@@ -157,18 +165,20 @@ const [isHandle,setIsHandle]=useState(false);
     }
     setOpenSnackBar(false);
   };
- const handleOpenLoading=()=>{
+  const handleOpenLoading=()=>{
     setIsHandle(true);
   }
   const handleCloseLoading=()=>{
     setIsHandle(false);
   }
+
   useEffect(() => {
     handleOpenLoading()
-    const getRes = async () => {
+   
+    const getRes = async () => { 
       try{
       const res = await fetch(
-        process.env.REACT_APP_API_LINK + `/api/post/all-post?status=0`,
+        process.env.REACT_APP_API_LINK + `/api/apart/all-aparts?status=2&owner.is_active=false`,
         {
           // get apart
           method: "GET",
@@ -178,24 +188,36 @@ const [isHandle,setIsHandle]=useState(false);
           },
         }
       );
-     
-      if (res.status === 200 ) {
+      const res1 = await fetch(
+        process.env.REACT_APP_API_LINK + `/api/block/all`,
+        {
+          // get block
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + `${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (res.status === 200 || res1.status === 200) {
         console.log("Vo 200OK");
         const result = await res.json();
+        const result1 = await res1.json();
         console.log(result.data);
-        setData(await handleData(result.data));
+        setData(await handleData(result.data, result1.data));
         handleCloseLoading()
       } else {
         const result = await res.json();
-        console.log(result.message)
-        handleOpenSnackBar(false)
+        alert(result.message);
         handleCloseLoading()
-      }}catch (err) {
+        handleOpenSnackBar(false)
+      }}
+      catch (err) {
         console.log(err);
         handleOpenSnackBar(false)
         handleCloseLoading()
       }
-    };
+  }
     getRes();
   }, []);
   return (
@@ -207,8 +229,9 @@ const [isHandle,setIsHandle]=useState(false);
         columns={columns}
         options={options}
       />
+      
       </LoadingOverlay>
-  <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
+      <Snackbar open={openSnackBar} type={snackType} handleClose={handleCloseSnackBar}></Snackbar>
     </div>
   );
 }

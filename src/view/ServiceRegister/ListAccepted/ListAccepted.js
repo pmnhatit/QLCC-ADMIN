@@ -12,6 +12,7 @@ import styles from "../../../asset/jss/material-dashboard-react/components/tasks
 
 import Snackbar from "../../../component/SnackBar/Snackbar.js"
 import LoadingOverlay from "react-loading-overlay";
+import PushNotiAdmin from "../../PushNotiAdmin.js"
 const useStyles = makeStyles(styles);
 
 export default function ListAccepted() {
@@ -20,7 +21,7 @@ export default function ListAccepted() {
  const [openSnackBar,setOpenSnackBar]=useState(false);
  const [snackType,setSnackType]=useState(true);
 const [isHandle,setIsHandle]=useState(false);
-
+const {PushNotificationAdmin}=PushNotiAdmin()
 
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
@@ -29,6 +30,7 @@ const [isHandle,setIsHandle]=useState(false);
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
+    download: false,
   };
   const columns = [
     {

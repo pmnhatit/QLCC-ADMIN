@@ -58,6 +58,10 @@ export default function InfoUser(props) {
             InputLabelProps={{
               shrink: true,
             }}
+            InputProps={{
+                        readOnly: true,
+                      }}
+            
             variant="outlined"
             defaultValue={data.name}
           />
@@ -73,6 +77,10 @@ export default function InfoUser(props) {
             InputLabelProps={{
               shrink: true,
             }}
+            InputProps={{
+                        readOnly: true,
+                      }}
+            
             variant="outlined"
             defaultValue={data.email}
           />
@@ -88,6 +96,10 @@ export default function InfoUser(props) {
             InputLabelProps={{
               shrink: true,
             }}
+            InputProps={{
+                        readOnly: true,
+                      }}
+            
             variant="outlined"
             defaultValue={data.phone}
           />
@@ -103,6 +115,10 @@ export default function InfoUser(props) {
             InputLabelProps={{
               shrink: true,
             }}
+            InputProps={{
+                        readOnly: true,
+                      }}
+            
             variant="outlined"
             defaultValue={data.identify_card}
           />
@@ -117,6 +133,11 @@ export default function InfoUser(props) {
             InputLabelProps={{
               shrink: true,
             }}
+            
+InputProps={{
+  readOnly: true,
+}}
+
             variant="outlined"
             defaultValue={data.native_place}
           />

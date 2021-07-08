@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { handleData,content,title } from "./ServiceListRegister.js";
+import { handleData,content,title,checkTerm } from "./ServiceListRegister.js";
 import CustomButton from "../../../component/CustomButtons/Button.js"
 import { useHistory } from "react-router-dom";
 import MUIDataTable from "mui-datatables";
@@ -24,18 +24,20 @@ import styles from "../../../asset/jss/material-dashboard-react/components/tasks
 import LoadPlace from "./LoadPlace.js";
 import Snackbar from "../../../component/SnackBar/Snackbar.js"
 import LoadingOverlay from "react-loading-overlay";
+import Alert from "@material-ui/lab/Alert";
+import PushNotiAdmin from "../../PushNotiAdmin.js"
 const useStyles = makeStyles(styles);
 
 export default function ListRegister() {
   const classes = useStyles();
-  
+  const {PushNotificationAdmin}=PushNotiAdmin()
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
   const [data, setData] = useState([]);
   const [isLoad,setIsLoad]=useState(false);
   const [openSnackBar,setOpenSnackBar]=useState(false);
   const [snackType,setSnackType]=useState(true);
-const [isHandle,setIsHandle]=useState(false);
+  const [isHandle,setIsHandle]=useState(false);
   const [service_id,setService_id]=useState("");
   const [serviceName,setServiceName]=useState("");
   const [draw_date,setDraw_date]=useState();
@@ -44,13 +46,16 @@ const [isHandle,setIsHandle]=useState(false);
   const [show,setShow]=useState (false);
   const [open, setOpen] = useState(false);
   const [open1, setOpen1] = useState(false);
+  const [open3, setOpen3] = useState(false);
   const [selectRow,setSelectRow]=useState();
   const [reason,setReason]=useState();
-  const [reload,setReload]=useState(true);
+  const [reload,setReload]=useState(true); 
+  const [term,setTerm]=useState({all:false,mor:false,after:false})
   const options = {
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
+    download: false,
     onTableChange: (action, tableState) => {
       console.log(action, tableState);
 
@@ -59,7 +64,7 @@ const [isHandle,setIsHandle]=useState(false);
       switch (action) {
 
         case "filterChange"://,"search"
-         
+
           handleFilter(tableState.displayData,tableState.filterList);
           break;
         default:
@@ -71,7 +76,7 @@ const [isHandle,setIsHandle]=useState(false);
       name: "id",   //0
       label: "id",
       options: {
-        display: false,
+        display: "excluded",
         filter: false,
         sort: false,
       },
@@ -170,6 +175,15 @@ const [isHandle,setIsHandle]=useState(false);
         },
       },
       {
+        name: "term",
+        label: "term",
+        options: {
+          display: "excluded",
+          filter: false,
+          sort: false,
+        },
+      },
+      {
         name: "",
         options: {
           customBodyRender: (value, tableMeta, updateValue) => {
@@ -219,7 +233,11 @@ const [isHandle,setIsHandle]=useState(false);
 
   const handleClick = async(row) => {
     setSelectRow(row);
+    console.log(row);
+    if(checkTerm(row[12],term)===true)
     handleClickOpen();
+    else handleClickOpen3()
+
   }
 
   const handleClick1 = async(row) => {
@@ -240,7 +258,13 @@ const [isHandle,setIsHandle]=useState(false);
     
     setOpen1(true);
   };
-
+  const handleClickOpen3 = (temp) => {
+    
+    setOpen3(true);
+  };
+  const handleClose3 = () => {
+    setOpen3(false);
+  };
   const handleAccepted= async () => {
     handleClose();
     console.log(selectRow);
@@ -251,17 +275,22 @@ const [isHandle,setIsHandle]=useState(false);
   
   };
  // console.log(body);
+ if(show===true)
   handleChangeStatus(selectRow[0],process.env.REACT_APP_API_LINK + `/api/register-service/update-confirm`,body, await getUser(selectRow[11]))
-  }
+  else
+  handleOpenSnackBar(false)  
+}
   const handleDenied= async () => {
     handleClose1();
     console.log(selectRow);
     const body = {
       register_id: selectRow[0],
       reason: reason
-  
   };
+  if(show===true)
   handleChangeStatus(selectRow[0],process.env.REACT_APP_API_LINK + `/api/register-service/update-reject`,body, await getUser(selectRow[11]))
+  else
+  handleOpenSnackBar(false)
   }
   const handleChangeStatus = async (id,url,body,token_device) => {
     handleOpenLoading();
@@ -298,6 +327,7 @@ const [isHandle,setIsHandle]=useState(false);
         await PushNotification(token_device);
         setReloadPlace(!reloadPlace)
         //history.push(`/admin/reportbill`);
+        PushNotificationAdmin()
         handleOpenSnackBar(true)
         handleCloseLoading()
       } else {
@@ -467,7 +497,7 @@ const [isHandle,setIsHandle]=useState(false);
       />
       </GridItem>
       <GridItem xs={12} sm={12} md={2} >
-       <LoadPlace service_id={service_id} service_name={serviceName} draw_date={draw_date} date={selectdate} reload={reloadPlace} show={show}></LoadPlace>
+       <LoadPlace service_id={service_id} service_name={serviceName} draw_date={draw_date} date={selectdate} reload={reloadPlace} show={show} setTerm={setTerm}></LoadPlace>
       </GridItem>
 
       <Dialog
@@ -519,6 +549,28 @@ const [isHandle,setIsHandle]=useState(false);
             Hủy
           </Button>
           <Button onClick={handleDenied} color="primary">
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={open3}
+        onClose={handleClose3}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">
+          Không thể xử lý
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+              <Alert severity="warning">
+                  Thời gian không còn trống
+                </Alert>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose3} color="primary">
             Xác nhận
           </Button>
         </DialogActions>

@@ -34,6 +34,7 @@ const [isHandle,setIsHandle]=useState(false);
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
+    downloadOptions:{filterOptions:{useDisplayedRowsOnly:true}}
   };
   const columns = [
     {
@@ -43,15 +44,16 @@ const [isHandle,setIsHandle]=useState(false);
         display: "excluded",
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
       name: "order",
-      label: "Số thứ tự",
+      label: "STT",
       options: {
-        display: false,
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -60,6 +62,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: true,
         sort: false,
+        download:false
       },
     },
     {
@@ -68,6 +71,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
@@ -77,6 +81,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: false,
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
@@ -86,6 +91,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: false,
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
@@ -94,6 +100,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: false,
         sort: true,
+        download:false
       },
     },
 
@@ -103,6 +110,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -112,6 +120,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: "excluded",
         filter: true,
         sort: false,
+        download:false
       },
     },
     {
@@ -121,6 +130,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: "excluded",
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
@@ -129,6 +139,80 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         
         filter: false,
+        sort: false,
+        download:false
+      },
+    },
+    {
+      name: "order",
+      label: "Order",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: true,
+      },
+    },
+    {
+      name: "apart",
+      label: "Apart",
+      options: {
+        display: "excluded",
+        filter: true,
+        sort: false,
+      },
+    },
+    {
+      name: "time",
+      label: "Time",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "old_index",
+      label: "Old index",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "new_index",
+      label: "New index",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "consume",
+      label: "Consume",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: true,
+      },
+    },
+
+    {
+      name: "total",
+      label: "Total",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: true,
+      },
+    },
+    {
+      name: "is_pay_download",
+      label: "Is pay",
+      options: {
+        display: "excluded",
+        filter: true,
         sort: false,
       },
     },

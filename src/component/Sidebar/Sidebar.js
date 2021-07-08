@@ -14,7 +14,7 @@ import Icon from "@material-ui/core/Icon";
 // core components
 import AdminNavbarLinks from "../Navbars/AdminNavbarLinks";
 // import RTLNavbarLinks from "components/Navbars/RTLNavbarLinks.js";
-
+import {PrivateRoute} from "../../privateRouter.js"
 import styles from "../../asset/jss/material-dashboard-react/components/sidebarStyle.js";
 
 const useStyles = makeStyles(styles);
@@ -46,6 +46,37 @@ export default function Sidebar(props) {
         });
         return (
           !prop.private &&
+          // <PrivateRoute  component={<NavLink
+          //   to={prop.layout + prop.path}
+          //   className={activePro + classes.item}
+          //   activeClassName="active"
+          //   key={key}
+          // >
+          //   <ListItem button className={classes.itemLink + listItemClasses} >
+          //     {typeof prop.icon === "string" ? (
+          //       <Icon
+          //         className={classNames(classes.itemIcon, whiteFontClasses, {
+          //           [classes.itemIconRTL]: props.rtlActive
+          //         })}
+          //       >
+          //         {prop.icon}
+          //       </Icon>
+          //     ) : (
+          //       <prop.icon
+          //         className={classNames(classes.itemIcon, whiteFontClasses, {
+          //           [classes.itemIconRTL]: props.rtlActive
+          //         })}
+          //       />
+          //     )}
+          //     <ListItemText
+          //       primary={props.rtlActive ? prop.rtlName : prop.name}
+          //       className={classNames(classes.itemText, whiteFontClasses, {
+          //         [classes.itemTextRTL]: props.rtlActive
+          //       })}
+          //       disableTypography={true}
+          //     />
+          //   </ListItem>
+          //  </NavLink>}/>
           <NavLink
             to={prop.layout + prop.path}
             className={activePro + classes.item}

@@ -4,13 +4,13 @@ import TimelineSeparator from "@material-ui/lab/TimelineSeparator";
 import TimelineConnector from "@material-ui/lab/TimelineConnector";
 import TimelineContent from "@material-ui/lab/TimelineContent";
 import TimelineDot from "@material-ui/lab/TimelineDot";
+import { FreeBreakfastSharp } from "@material-ui/icons";
 
-
-export const title="Yêu cầu sử dụng khu vực chung"
-export const content="Yêu cầu của anh/chị đã được xử lý"
+export const title = "Yêu cầu sử dụng khu vực chung";
+export const content = "Yêu cầu của anh/chị đã được xử lý";
 
 export const handleData = (list, place) => {
-   console.log(list);
+  console.log(list);
   console.log(place);
   const newlist = [];
   for (let i = 0; i < list.length; i++) {
@@ -43,7 +43,7 @@ export const handleData = (list, place) => {
       ) : (
         <div style={{ color: "red" }}>Chưa đọc</div>
       ),
-      user_id:list[i].user_id,
+      user_id: list[i].user_id,
     };
   }
   console.log(newlist);
@@ -66,7 +66,6 @@ const returnPlace = (list, placeList) => {
   }
 };
 
-
 export const findDate = (list, date) => {
   console.log(list);
 
@@ -74,7 +73,7 @@ export const findDate = (list, date) => {
   let mor = false;
   let after = false;
   for (let item of list) {
-    if (item.date === date) {
+    if (compareDate(item.date, date)) {
       if (item.term === 0) all = true;
       else {
         if (item.term === 1) mor = true;
@@ -84,11 +83,20 @@ export const findDate = (list, date) => {
   }
   return { all, mor, after };
 };
+const compareDate = (data1, data2) => {
+  let date1 = new Date(data1);
+  let date2 = new Date(data2);
+  if (
+    date1.getDate() === date2.getDate() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getYear() === date2.getYear()
+  )
+    return true;
+  return false;
+};
 export const renderLine = (value) => {
   let morColor = "primary";
   let afterColor = "primary";
-  console.log("in");
-  console.log(value.all);
   if (value.all === true) {
     morColor = "secondary";
     afterColor = "secondary";
@@ -114,4 +122,28 @@ export const renderLine = (value) => {
       </TimelineItem>
     </Timeline>
   );
+};
+export const checkTerm = (term, termList) => {
+  console.log(term);
+  console.log(termList);
+  switch (term) {
+    case 0:
+      if (
+        termList.all === false &&
+        termList.mor === false &&
+        termList.after === false
+      )
+        return true;
+      return false;
+
+    case 1:
+      if (termList.mor === false) return true;
+      return false;
+    case 2:
+      if (termList.after === false) return true;
+      return false;
+
+    default:
+      break;
+  }
 };

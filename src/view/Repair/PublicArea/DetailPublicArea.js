@@ -256,6 +256,8 @@ export default function DetailPublicArea(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.apart_name || ""}
@@ -270,6 +272,8 @@ export default function DetailPublicArea(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.time}
@@ -284,6 +288,8 @@ export default function DetailPublicArea(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.author_name}
@@ -297,6 +303,8 @@ export default function DetailPublicArea(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.title}
@@ -310,6 +318,8 @@ export default function DetailPublicArea(props) {
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.content}

@@ -10,13 +10,14 @@ import styles from "../../../asset/jss/material-dashboard-react/components/tasks
 import { handleData } from "../ServiceRepair.js";
  import Snackbar from "../../../component/SnackBar/Snackbar.js"
   import LoadingOverlay from "react-loading-overlay";
-
+  import PushNotiAdmin from "../../PushNotiAdmin.js"
 const useStyles = makeStyles(styles);
 export default function ListPublicArea(props) {
   const classes = useStyles();
   const history = useHistory();
   const {type,status}=props;
   const token = useSelector((state) => state.user.token);
+  const {PushNotificationAdmin}=PushNotiAdmin()
   const [data, setData] = useState([]);
    const [openSnackBar,setOpenSnackBar]=useState(false);
     const [snackType,setSnackType]=useState(true);
@@ -25,23 +26,24 @@ export default function ListPublicArea(props) {
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
+    download: false,
   };
   const columns = [
     {
       name: "id",
       label: "id",
       options: {
-        display: false,
-        filter: true,
-        sort: true,
+        display: "excluded",
+        filter: false,
+        sort: false,
       },
     },
     {
       name: "order",
       label: "Số thứ tự",
       options: {
-        filter: true,
-        sort: false,
+        filter: false,
+        sort: true,
       },
     },
     {
@@ -57,7 +59,7 @@ export default function ListPublicArea(props) {
       label: "Ngày tạo",
       options: {
         filter: true,
-        sort: false,
+        sort: true,
       },
     },
     {
@@ -65,7 +67,7 @@ export default function ListPublicArea(props) {
       label: "",
       options: {
         display: false,
-        filter: true,
+        filter: false,
         sort: false,
       },
     },
@@ -73,13 +75,23 @@ export default function ListPublicArea(props) {
       name: "is_read_admin_value",
       label: "Tình trạng",
       options: {
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "is_read_admin_name",
+      label: "Tình trạng.",
+      options: {
+        display: "excluded",
         filter: true,
         sort: false,
       },
     },
     {
-      name: "Chi tiết",
-      options: {
+      name: "",
+      options: { filter: false,
+        sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <div>
@@ -134,7 +146,7 @@ export default function ListPublicArea(props) {
       );
       if (res.status === 200) {
         console.log("ok");
-     
+        PushNotificationAdmin()
       } else {
         console.log("SOMETHING WENT WRONG");
       }

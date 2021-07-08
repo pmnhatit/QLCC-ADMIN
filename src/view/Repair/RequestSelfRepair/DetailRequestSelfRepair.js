@@ -22,7 +22,7 @@ import { useParams, useHistory } from "react-router-dom";
 import {handleData,title,content} from "./ServiceDetailRequestSelfRepair.js"
 import Snackbar from "../../../component/SnackBar/Snackbar.js"
 import LoadingOverlay from "react-loading-overlay";
-
+import PushNotiAdmin from "../../PushNotiAdmin.js"
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -61,6 +61,7 @@ export default function DetailRequestSelfRepair(props) {
   const history = useHistory();
   const token = useSelector((state) => state.user.token);
   const { notice_id } = useParams();
+  const {PushNotificationAdmin}=PushNotiAdmin()
   const [data, setData] = useState({
     id: "",
     apart_id: "",
@@ -79,12 +80,14 @@ export default function DetailRequestSelfRepair(props) {
   const [reload,setReload]=useState(false);
   const [openSnackBar,setOpenSnackBar]=useState(false);
   const [snackType,setSnackType]=useState(true);
-const [isHandle,setIsHandle]=useState(false);
+  const [isHandle,setIsHandle]=useState(false);
+  
   
   const handleChangeStatus = async (next_status) => {
     try {   
       handleClose();
       handleClose1();
+      handleOpenLoading()
       const body = {
         notice_id: data._id,
         status: next_status
@@ -107,15 +110,22 @@ const [isHandle,setIsHandle]=useState(false);
         //const result = await res.json();
         console.log("ok");
         await PushNotification();
+        PushNotificationAdmin()
         setIsError(false);  
         setReload(!reload);
         //history.push(`/admin/reportbill`);
+        handleOpenSnackBar(true)
+        handleCloseLoading()
       } else {
         console.log("SOMETHING WENT WRONG");
         setIsError(true);
+        handleOpenSnackBar(false)
+        handleCloseLoading()
       }
     } catch (err) {
       console.log(err);
+      handleOpenSnackBar(false)
+      handleCloseLoading()
     }
   };
   const PushNotification=async()=>
@@ -180,6 +190,7 @@ const [isHandle,setIsHandle]=useState(false);
         }
       } catch (err) {
         console.log(err);
+        
       }
     }
     setIsLoad(false);
@@ -248,6 +259,7 @@ const [isHandle,setIsHandle]=useState(false);
   }
   const getUserAndApart = async (data)=>
   { 
+    try{
     const res = await fetch(
       process.env.REACT_APP_API_LINK + `/api/user/${data.author}`,
       {
@@ -281,12 +293,19 @@ const [isHandle,setIsHandle]=useState(false);
     } else {
       const result = await res.json();
       console.log(result.message);
+      handleOpenSnackBar(false)
+      
+    }}
+    catch(err)
+    {
+      handleOpenSnackBar(false)
     }
 
   }
   useEffect(() => {
     const getRes = async () => {
       setIsLoad(true);
+      try{
       const res = await fetch(
         process.env.REACT_APP_API_LINK + `/api/repair/${notice_id}`,
         {
@@ -310,7 +329,10 @@ const [isHandle,setIsHandle]=useState(false);
       } else {
         const result = await res.json();
         console.log(result.message);
-      }
+        handleOpenSnackBar(false)
+      }}
+      catch(err){ handleOpenSnackBar(false)}
+      
     };
     getRes();
   }, [reload]);
@@ -345,6 +367,8 @@ const [isHandle,setIsHandle]=useState(false);
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.apart_name || ""}
@@ -359,6 +383,8 @@ const [isHandle,setIsHandle]=useState(false);
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.time}
@@ -373,6 +399,8 @@ const [isHandle,setIsHandle]=useState(false);
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.author_name}
@@ -386,6 +414,8 @@ const [isHandle,setIsHandle]=useState(false);
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.title}
@@ -399,6 +429,8 @@ const [isHandle,setIsHandle]=useState(false);
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={data.content}
@@ -412,6 +444,8 @@ const [isHandle,setIsHandle]=useState(false);
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}InputProps={{
+                    readOnly: true,
                   }}
                   variant="outlined"
                   defaultValue={ data.status_value }

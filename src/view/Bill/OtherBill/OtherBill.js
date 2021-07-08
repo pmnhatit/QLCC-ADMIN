@@ -23,7 +23,7 @@ export default function OtherBill(props) {
   const [data, setData] = useState([]);
   const [openSnackBar,setOpenSnackBar]=useState(false);
   const [snackType,setSnackType]=useState(true);
-const [isHandle,setIsHandle]=useState(false);
+  const [isHandle,setIsHandle]=useState(false);
   const [statis, setStatis] = useState({
     total: 0,
     total_pay: 0,
@@ -34,6 +34,7 @@ const [isHandle,setIsHandle]=useState(false);
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
+    downloadOptions:{filterOptions:{useDisplayedRowsOnly:true}}
   };
   const columns = [
     {
@@ -43,14 +44,16 @@ const [isHandle,setIsHandle]=useState(false);
         display: "excluded",
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
       name: "order",
-      label: "Số thứ tự",
+      label: "STT",
       options: {
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -59,6 +62,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: true,
         sort: false,
+        download:false
       },
     },
     {
@@ -68,6 +72,7 @@ const [isHandle,setIsHandle]=useState(false);
           display: false,
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
@@ -77,6 +82,7 @@ const [isHandle,setIsHandle]=useState(false);
         
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -85,6 +91,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -93,6 +100,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -101,6 +109,7 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
@@ -109,14 +118,16 @@ const [isHandle,setIsHandle]=useState(false);
       options: {
         filter: false,
         sort: true,
+        download:false
       },
     },
     {
       name: "note",
       label: "Ghi chú",
       options: {
-        filter: true,
+        filter: false,
         sort: false,
+        download:false
       },
     },
     {
@@ -126,6 +137,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: "excluded",
         filter: true,
         sort: false,
+        download:false
       },
     },
     {
@@ -135,6 +147,7 @@ const [isHandle,setIsHandle]=useState(false);
         display: "excluded",
         filter: false,
         sort: false,
+        download:false
       },
     },
     {
@@ -142,6 +155,98 @@ const [isHandle,setIsHandle]=useState(false);
       label: "Tình trạng",
       options: {
         
+        filter: false,
+        sort: false,
+        download:false
+      },
+    },
+
+    {
+      name: "order",
+      label: "Order",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: true,
+      },
+    },
+    {
+      name: "apart",
+      label: "Apart",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "time",
+      label: "Time",
+        options: {
+          display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "apart_management",
+      label: "Apart management",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: true,
+      },
+    },
+    {
+      name: "parking_fees",
+      label: "Parking fees",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: true,
+      },
+    },
+    {
+      name: "maintenance_fee",
+      label: "Maintenance fee",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: true,
+      },
+    },
+    {
+      name: "service_charge",
+      label: "Service charge",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: true,
+      },
+    },
+    {
+      name: "total",
+      label: "Total",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: true,
+      },
+    },
+    {
+      name: "note",
+      label: "Note",
+      options: {
+        display: "excluded",
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "is_pay_download",
+      label: "Is pay",
+      options: {
+        display: "excluded",
         filter: false,
         sort: false,
       },

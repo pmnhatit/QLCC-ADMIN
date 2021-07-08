@@ -41,6 +41,7 @@ export default function HandledReport(props) {
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
+    download: false,
   };
   const columns = [
     {
@@ -104,7 +105,7 @@ export default function HandledReport(props) {
 
     {
       name: "",
-      options: {
+      options: { filter: false,
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <div>

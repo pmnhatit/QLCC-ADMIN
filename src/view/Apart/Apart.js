@@ -11,6 +11,7 @@ import Button from "../../component/CustomButtons/Button.js";
 
 import CustomTabs from "../../component/CustomTabs/CustomTabs.js";
 import ListApart from "./ListApart/ListApart.js";
+import ListApartNotApp from "./ListApart/ListApartNotApp.js"
 //import AddApart from "./AddApart/AddApart.js"
 const styles = {
   cardCategoryWhite: {
@@ -52,13 +53,13 @@ export default function Apart() {
                     <ListApart/>
                 )
               },
-              // {
-              //   tabName: "Danh sách căn hộ",
-              //   //tabIcon: BugReport,
-              //   tabContent: (      
-              //       <ListApart/>
-              //   )
-              // },
+              {
+                tabName: "Danh sách căn hộ không sử dụng app",
+                //tabIcon: BugReport,
+                tabContent: (      
+                    <ListApartNotApp/>
+                )
+              },
               // {
               //   tabName: "Thêm căn hộ",
               //   //tabIcon: Code,

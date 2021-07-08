@@ -1,5 +1,6 @@
 
-import NumberFormat from 'react-number-format';
+
+var numeral = require('numeral');
 export const handleData = (data, apart) => {
   //console.log(data);
   const newdata = [];
@@ -14,13 +15,15 @@ export const handleData = (data, apart) => {
         water_bill: data[i].water_bill,
         other_bill: data[i].other_bill,
         total_money: data[i].total_money,
-        electric:<NumberFormat value={data[i].electric_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
-        water:<NumberFormat value={data[i].water_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
-        other:<NumberFormat value={data[i].other_bill} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
-        total:<NumberFormat value={data[i].total_money} className="foo" displayType={'text'} thousandSeparator={true} suffix={' VND'} renderText={(value, props) => value} />,
-        
-        is_pay: data[i].is_pay ?"Đã thanh toán":"Chưa thanh toán",//(<div style={{color:"green"}}>Đã thanh toán</div> ):<div style={{color:"red"}}>Chưa thanh toán</div>
+        electric:numeral(data[i].electric_bill).format('0,0,0') + " VND",
+        water:numeral(data[i].water_bill).format('0,0,0') + " VND",
+        other:numeral(data[i].other_bill).format('0,0,0') + " VND",
+        total:numeral(data[i].total_money).format('0,0,0') + " VND",
+        is_pay: data[i].is_pay ?"Đã thanh toán":"Chưa thanh toán",
+        is_pay_download: data[i].is_pay ?"Paid":"Unpaid",
         is_pay_value: data[i].is_pay ?(<div style={{color:"green"}}>Đã thanh toán</div> ):<div style={{color:"red"}}>Chưa thanh toán</div>,
+        is_active:data[i].is_active?"Có dùng app":"Không dùng app",
+        is_active_download:data[i].is_active?"Using":"Not Using",
         flag:data[i].is_pay,
       };
     }

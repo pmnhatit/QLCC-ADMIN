@@ -40,14 +40,16 @@ const [id,setID]=useState("");
     filterType: "dropdown",
     responsive: "scroll",
     selectableRows: false,
+    download:false,
+    downloadOptions:{filterOptions:{useDisplayedRowsOnly:true}}
   };
   const columns = [
     {
       name: "id",
       label: "id",
       options: {
-        display: false,
-        filter: true,
+        display: "excluded",
+        filter: false,
         sort: true,
       },
     },
@@ -55,22 +57,22 @@ const [id,setID]=useState("");
       name: "order",
       label: "Số thứ tự",
       options: {
-        filter: true,
-        sort: false,
+        filter: false,
+        sort: true,
       },
     },
     {
       name: "name",
       label: "Tên người dùng",
       options: {
-        filter: true,
+        filter: false,
         sort: false,
       },
     },{
         name: "phone",
         label: "Số điện thoại",
         options: {
-          filter: true,
+          filter: false,
           sort: false,
         },
       },
@@ -78,10 +80,80 @@ const [id,setID]=useState("");
         name: "license_plates",
         label: "Biển số xe",
         options: {
-          filter: true,
+          filter: false,
           sort: false,
         },
-      },  
+      }, 
+      {
+        name: "address",
+        label: "Địa chỉ",
+        options: {
+          filter: false,
+          sort: false,
+        },
+      },
+      {
+        name: "apart",
+        label: "Căn hộ",
+        options: {
+          filter: false,
+          sort: false,
+        },
+      },
+      {
+        name: "order",
+        label: "Số thứ tự",
+        options: {
+          display: "excluded",
+          filter: false,
+          sort: true,
+        },
+      },
+      {
+        name: "name",
+        label: "Name",
+        options: {
+          display: "excluded",
+          filter: false,
+          sort: false,
+        },
+      },{
+          name: "phone",
+          label: "Phone",
+          options: {
+            display: "excluded",
+            filter: false,
+            sort: false,
+          },
+        },
+      {
+          name: "license_plates",
+          label: "License Plates",
+          options: {
+            display: "excluded",
+            filter: false,
+            sort: false,
+          },
+        }, 
+        {
+          name: "address",
+          label: "Native Place",
+          options: {
+            display: "excluded",
+            filter: false,
+            sort: false,
+          },
+        },
+        {
+          name: "apart",
+          label: "Apart",
+          options: {
+            display: "excluded",
+            filter: false,
+            sort: false,
+          },
+        },
+      
     {
       name: "",
       options: {
@@ -227,7 +299,7 @@ const [id,setID]=useState("");
     <div>
       <LoadingOverlay active={isHandle} spinner text="Đang xử lý vui lòng chờ...">
       <MUIDataTable
-        title={"Danh sách căn hộ "}
+        title={""}
         data={data}
         columns={columns}
         options={options}

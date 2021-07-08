@@ -4,10 +4,10 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
-import Link from "@material-ui/core/Link";
-import Grid from "@material-ui/core/Grid";
+// import FormControlLabel from "@material-ui/core/FormControlLabel";
+// import Checkbox from "@material-ui/core/Checkbox";
+// import Link from "@material-ui/core/Link";
+// import Grid from "@material-ui/core/Grid";
 
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
@@ -17,7 +17,7 @@ import Snackbar from "@material-ui/core/Snackbar";
 import { addUser } from "../../redux/action/userAction";
 import { useHistory } from "react-router-dom";
 
-import {messaging,receiveMessage} from "../../firebase.js"
+import {messaging} from "../../firebase.js"
 
 
 const useStyles = makeStyles((theme) => ({
@@ -81,7 +81,6 @@ export default function Login() {
   
   const changeToken_device=async(user_id,token)=>
   {
-    
     messaging.requestPermission().then(()=>{
       return messaging.getToken();
     }).then(token_device=>{
@@ -154,7 +153,7 @@ export default function Login() {
           const action = addUser(result.infoUser,result.token);
           dispatch(action);
           await changeToken_device(result.infoUser._id,result.token);
-
+          
           history.push("/admin/apart");
         } else if (res.status === 401) {
           setContent("Tên đăng nhập hoặc mật khẩu sai");
@@ -169,11 +168,12 @@ export default function Login() {
     <Container component="main" maxWidth="xs">  
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
+        {/* <Avatar className={classes.avatar}> */}
+          {/* <LockOutlinedIcon /> */}
+          <img style={{width:"100px"}} src={process.env.PUBLIC_URL + '/logo.PNG'}></img>
+        {/* </Avatar> */}
         <Typography component="h1" variant="h5">
-          Sign in
+         Đăng nhập
         </Typography>
         <form className={classes.form} noValidate>
           <TextField

@@ -96,7 +96,7 @@ export default function AdminNavbarLinks() {
           }
         );
         const res1 = await fetch(
-          process.env.REACT_APP_API_LINK + `/api/repair/count-notices?type=0&status=0`,
+          process.env.REACT_APP_API_LINK + `/api/repair/count-notices?type=0&status=0&is_read_admin=false`,
           {
             // get block
             method: "GET",
@@ -107,7 +107,7 @@ export default function AdminNavbarLinks() {
           }
         );
         const res2 = await fetch(
-          process.env.REACT_APP_API_LINK + `/api/repair/count-notices?type=1&status=0`,
+          process.env.REACT_APP_API_LINK + `/api/repair/count-notices?type=2&status=0`,
           {
             // get block
             method: "GET",
@@ -118,7 +118,7 @@ export default function AdminNavbarLinks() {
           }
         );
         const res3 = await fetch(
-          process.env.REACT_APP_API_LINK + `/api/repair/count-notices?type=2&status=0`,
+          process.env.REACT_APP_API_LINK + `/api/repair/count-notices?type=1&status=0`,
           {
             // get block
             method: "GET",
@@ -258,42 +258,42 @@ export default function AdminNavbarLinks() {
                 <ClickAwayListener onClickAway={handleCloseNotification}>
                   <MenuList role="menu">
                     <MenuItem
-                      onClick={handleCloseNotification}
+                      onClick={e=>{handleCloseNotification(); history.push('/admin/reportbill')}}
                       className={classes.dropdownItem}>
                       Khiếu nại hóa đơn
                       {noti.bill !== 0 && (<span className={classes.num_notifications}>{noti.bill}</span>)}
                     </MenuItem>
                     <MenuItem
-                      onClick={handleCloseNotification}
+                      onClick={e=>{handleCloseNotification(); history.push('/admin/repair')}}
                       className={classes.dropdownItem}>
                       Yêu cầu sửa chữa khu vực chung
                       {noti.repair1 !== 0 && (<span className={classes.num_notifications}>{noti.repair1}</span>)}
                     </MenuItem>
                     <MenuItem
-                      onClick={handleCloseNotification}
+                      onClick={e=>{handleCloseNotification(); history.push('/admin/repair/repair')}}
                       className={classes.dropdownItem}>
                         Yêu cầu dịch vụ sửa chữa
                       {noti.repair2 !== 0 && (<span className={classes.num_notifications}>{noti.repair2}</span>)}
                     </MenuItem><MenuItem
-                      onClick={handleCloseNotification}
+                      onClick={e=>{handleCloseNotification(); history.push('/admin/repair/self_repair')}}
                       className={classes.dropdownItem}>
-                        Yêu cầu tự sữa chữa
+                        Yêu cầu tự sửa chữa
                       {noti.repair3 !== 0 && (<span className={classes.num_notifications}>{noti.repair3}</span>)}
                     </MenuItem>
                     <MenuItem
-                      onClick={handleCloseNotification}
+                      onClick={e=>{handleCloseNotification(); history.push('/admin/noti_parking')}}
                       className={classes.dropdownItem}>
                         Khiếu nại bãi xe
                       {noti.parking !== 0 && (<span className={classes.num_notifications}>{noti.parking}</span>)}
                     </MenuItem>
                     <MenuItem
-                      onClick={handleCloseNotification}
+                      onClick={e=>{handleCloseNotification(); history.push('/admin/service_register')}}
                       className={classes.dropdownItem}>
                         Đăng kí sử dụng khu vực chung
                       {noti.service !== 0 && (<span className={classes.num_notifications}>{noti.service}</span>)}
                     </MenuItem>
                     <MenuItem
-                      onClick={handleCloseNotification}
+                      onClick={e=>{handleCloseNotification(); history.push('/admin/browse_post')}}
                       className={classes.dropdownItem}>
                         Yêu cầu đăng bài
                       {noti.post !== 0 && (<span className={classes.num_notifications}>{noti.post}</span>)}
@@ -351,18 +351,13 @@ export default function AdminNavbarLinks() {
                     >
                       Thông tin cá nhân
                     </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseProfile}
-                      className={classes.dropdownItem}
-                    >
-                      Settings
-                    </MenuItem>
+                   
                     <Divider light />
                     <MenuItem
                       onClick={handleLogout}
                       className={classes.dropdownItem}
                     >
-                      Logout
+                      Đăng xuất
                     </MenuItem>
                   </MenuList>
                 </ClickAwayListener>

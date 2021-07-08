@@ -11,8 +11,8 @@ import Navbar from "components/Navbars/Navbar.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
 //import FixedPlugin from "components/FixedPlugin/FixedPlugin.js";
 
-import routes from "routes.js";
-
+//import routes from "routes.js";
+import RenderRoute from "../routes";
 import styles from "assets/jss/material-dashboard-react/layouts/adminStyle.js";
 
 import bgImage from "assets/img/sidebar-2.jpg";
@@ -50,6 +50,8 @@ export default function Admin({ ...rest }) {
   const [color, setColor] = React.useState("blue");
   const [fixedClasses, setFixedClasses] = React.useState("dropdown show");
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const {render}=RenderRoute();
+  const routes=render()
   const handleImageClick = image => {
     setImage(image);
   };

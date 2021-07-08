@@ -14,11 +14,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LimitTags(props) {
   const classes = useStyles();
-    const {data,changeData}=props
+    const {data,changeData,lable}=props
   return (
     <div className={classes.root}>
       <Autocomplete
-        multiple
+        //multiple
         limitTags={5}
         fullWidth={true}
         onChange={(event, newValue) => {
@@ -31,7 +31,7 @@ export default function LimitTags(props) {
         getOptionLabel={(option) => option.name}
         defaultValue={data.default}
         renderInput={(params) => (
-          <TextField {...params} variant="outlined" label="Căn hộ(Chỉ chọn 1)" placeholder="" />
+          <TextField {...params} variant="outlined" label={lable} placeholder="" />
         )}
       />
     </div>

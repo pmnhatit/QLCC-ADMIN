@@ -46,6 +46,7 @@ export default function UserProfile() {
   const [apart,setApart]=useState([]);
   const [isLoading,setIsLoading]=useState(false);
   const {id}=useParams();
+  const [image,setImage]=useState("");
   const [openSnackBar,setOpenSnackBar]=useState(false);
   const [snackType,setSnackType]=useState(true);
 const [isHandle,setIsHandle]=useState(false);
@@ -99,7 +100,7 @@ const getUrl = async (key) => {
     }
   }
   else{
-      return 
+      return ""
   }
 };
   useEffect(() => {
@@ -137,6 +138,9 @@ const getUrl = async (key) => {
         
         setData(result.data);
         setApart(result1.data);
+        console.log(result.data.avatar!=="");
+        if(result.data.avatar!=="") setImage(await getUrl(result.data.avatar))
+        else setImage("")
         setIsLoading(false);
         handleCloseLoading()
       } else {
@@ -162,7 +166,8 @@ const getUrl = async (key) => {
       <GridItem xs={12} sm={12} md={4}>
           <Card profile >
             <CardAvatar style={{marginTop:"20px"}} profile>    
-                <img src={avatar} alt="..." />
+          
+               {image!==""? <img src={image} alt="..." /> : <img  src={process.env.PUBLIC_URL + '/noImage.jpg'}></img>}
             </CardAvatar>
           </Card>
         </GridItem>

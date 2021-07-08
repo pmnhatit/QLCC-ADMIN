@@ -1,15 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
-import Alert from "@material-ui/lab/Alert";
-//import InputLabel from "@material-ui/core/InputLabel";
-// core components
-import GridItem from "../../../../component/Grid/GridItem.js";
-import GridContainer from "../../../../component/Grid/GridContainer.js";
-import Button from "../../../../component/CustomButtons/Button.js";
-import { to, typeList } from "../ServiceCreateNotification.js";
 import TextField from "@material-ui/core/TextField";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -53,6 +46,7 @@ export default function BlockNotification(props) {
  // console.log("block");
   useEffect(() => {
     setIsLoad(true);
+    handleOpenLoading()
     const getRes = async () => {
       try{
       const res1 = await fetch(

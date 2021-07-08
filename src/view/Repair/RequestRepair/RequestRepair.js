@@ -12,6 +12,7 @@ import CustomTabs from "../../../component/CustomTabs/CustomTabs.js";
 import CardHeader from "../../../component/Card/CardHeader.js";
 import Repair from "../Repair/Repair.js";
 import ListRequestRepair from "./ListRequestRepair"
+import ListFinishRequestRepair from "./ListFinishRequestRepair"
 const styles = {
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -74,7 +75,7 @@ export default function PublicArea() {
                 tabName: "Đã sửa xong",
                 //tabIcon: Code,
                 tabContent: (
-                  <ListRequestRepair type={2} status={2}/>
+                  <ListFinishRequestRepair type={2} status={2}/>
                 )
               },
               {

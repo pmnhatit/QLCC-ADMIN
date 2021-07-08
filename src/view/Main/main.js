@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Login from "../Login/login";
 import Admin from "../../layouts/Layout";
 import {messaging} from "../../firebase"
-
+import { PrivateRoute } from '../../privateRouter';
 export default function Main()
 {   
   // messaging.onMessage(async (payload) => {
@@ -36,7 +36,7 @@ export default function Main()
             <Switch>
                  <Route  exact path="/" component={Login} /> 
                 {/* <Route path="/" component={LoginContainer}/> */}
-                <Route component={DefaultContainer}/>  
+                <PrivateRoute component={DefaultContainer}/>  
                     
             </Switch>
         </div>

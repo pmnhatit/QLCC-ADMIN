@@ -121,13 +121,14 @@ export default function DetailAllBill(props) {
   };
   const handleNoti1 = async() => {
       handleOpenLoading()
+      handleClose1()
       const body = {
         apart_id: data.apart_id,
         apart_name: data.apart_name,
         month: data.month,
         year: data.year,
         total_money: data.total_money 
-    
+        
       };
       console.log(body);
      handleNoti(body,`/api/bill-noti/create-reminder`,"POST")
@@ -136,6 +137,7 @@ export default function DetailAllBill(props) {
   };
   const handleNoti2 = () => {
     handleOpenLoading()
+    handleClose2()
   const body = {
         apart_id: data.apart_id,
         apart_name: data.apart_name,
